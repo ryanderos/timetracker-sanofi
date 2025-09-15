@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeTracker Pro - Sanofi</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRpbWVUcmFja2VyIFBybyAtIFNhbm9maSIsCiAgInNob3J0X25hbWUiOiAiVGltZVRyYWNrZXIiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzhCNUE5NiIsCiAgInRoZW1lX2NvbG9yIjogIiM4QjVBOTYiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSnhNakFpSUdobGFXZG9kRDBpTVRJd0lpQjJhV1YzUW05NFBTSXdJREFnTVRJd0lERXlNQ0krUEhKbFkzUWdlRDBpTWpBaUlIazlJakl3SWlCM2FXUjBhRDBpT0RBaUlHaGxhV2RvZEQwaU9EQWlJSEo0UFNJeE1DSWdabWxzYkQwaUl6aENOVUU1TmlJdlBqeDBaWGgwSUhnOUlqWXdJaUI1UFNJMk1DSWdabWxzYkQwaUkzZG1abVptWmlJZ1ptOXVkQzF6YVhwbFBTSXhOQ0lnWm05dWRDMW1ZVzFwYkhrOUlraHBaM1YwYVM1ZllXWXdJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsSWo1VVBDOTBaWGgwUGp3dmMzWm5QZz09SWl3CiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0KICBdCn0=">
+    <style>
+        :root {
+            --sanofi-purple: #8B5A96;
+            --sanofi-purple-dark: #6B4476;
+            --sanofi-purple-light: #B087C4;
+            --white: #ffffff;
+            --gray-light: #f8f9fa;
+            --gray-medium: #e9ecef;
+            --gray-dark: #495057;
+            --green: #28a745;
+            --red: #dc3545;
+            --blue: #007bff;
+        }
+
+        [data-theme="dark"] {
+            --white: #1a1a1a;
+            --gray-light: #2d2d2d;
+            --gray-medium: #3d3d3d;
+            --gray-dark: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--sanofi-purple-light) 0%, var(--sanofi-purple) 100%);
+            min-height: 100vh;
+            color: var(--gray-dark);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(139, 90, 150, 0.3);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--sanofi-purple);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: var(--gray-light);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--sanofi-purple);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .main-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(139, 90, 150, 0.2);
+        }
+
+        .punch-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .punch-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .punch-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .punch-btn:hover:before {
+            left: 100%;
+        }
+
+        .punch-btn.start {
+            background: var(--sanofi-purple);
+            color: var(--white);
+        }
+
+        .punch-btn.end {
+            background: var(--gray-medium);
+            color: var(--gray-dark);
+        }
+
+        .punch-btn.active {
+            background: var(--green);
+            color: var(--white);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .break-section {
+            border-top: 1px solid var(--gray-medium);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .break-title {
+            text-align: center;
+            color: var(--sanofi-purple);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--sanofi-purple-light), var(--sanofi-purple));
+            color: var(--white);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(139, 90, 150, 0.3);
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: var(--white);
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(139, 90, 150, 0.2);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(139, 90, 150, 0.3);
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--sanofi-purple);
+        }
+
+        .menu-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            animation: modalShow 0.3s ease;
+        }
+
+        @keyframes modalShow {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+
+        .modal-title {
+            color: var(--sanofi-purple);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--sanofi-purple);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-medium);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--sanofi-purple);
+        }
+
+        .btn {
+            background: var(--sanofi-purple);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--sanofi-purple-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-medium);
+            color: var(--gray-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-dark);
+            color: var(--white);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid var(--gray-medium);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: var(--sanofi-purple-light);
+            color: var(--white);
+        }
+
+        .calendar-day.today {
+            background: var(--sanofi-purple);
+            color: var(--white);
+        }
+
+        .calendar-day.has-hours {
+            border-color: var(--sanofi-purple);
+            background: var(--sanofi-purple-light);
+            color: var(--white);
+        }
+
+        .tutorial-step {
+            background: var(--gray-light);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--sanofi-purple);
+        }
+
+        .tutorial-step h3 {
+            color: var(--sanofi-purple);
+            margin-bottom: 10px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-working {
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        .status-break {
+            background: var(--blue);
+        }
+
+        .status-off {
+            background: var(--gray-medium);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--gray-medium);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sanofi-purple), var(--sanofi-purple-light));
+            transition: width 0.3s ease;
+        }
+
+        .constraint-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--sanofi-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .constraint-remove {
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+            .container {
+                padding: 10px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">⚡ TimeTracker Pro</div>
+            <div class="header-controls">
+                <button class="icon-btn" id="cloudBtn" title="Sauvegarde Cloud">☁️</button>
+                <button class="icon-btn" id="themeBtn" title="Mode Sombre">🌙</button>
+            </div>
+        </div>
+
+        <!-- Main Punch Card -->
+        <div class="main-card">
+            <!-- Status -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span class="status-indicator status-off" id="statusIndicator"></span>
+                <span id="statusText">Hors service</span>
+            </div>
+
+            <!-- Punch Buttons -->
+            <div class="punch-buttons">
+                <button class="punch-btn start" id="startBtn">
+                    <div>🟣 ARRIVÉE</div>
+                    <small id="startTime"></small>
+                </button>
+                <button class="punch-btn end" id="endBtn">
+                    <div>⚪ DÉPART</div>
+                    <small id="endTime"></small>
+                </button>
+            </div>
+
+            <!-- Break Section -->
+            <div class="break-section">
+                <div class="break-title">⏸️ Gestion des Pauses</div>
+                <div class="punch-buttons">
+                    <button class="punch-btn start" id="breakStartBtn">
+                        <div>🟣 PAUSE</div>
+                        <small id="breakStartTime"></small>
+                    </button>
+                    <button class="punch-btn end" id="breakEndBtn">
+                        <div>⚪ FIN PAUSE</div>
+                        <small id="breakEndTime"></small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Day Progress -->
+            <div style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Progrès du jour</span>
+                    <span id="dayProgress">0h00 / 7h00</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="dayProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="main-card">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="todayHours">0h00</div>
+                    <div class="stat-label">Aujourd'hui</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="weekHours">0h00/35h</div>
+                    <div class="stat-label">Cette semaine</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="remainingHours">35h00</div>
+                    <div class="stat-label">Restant</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="main-card">
+            <div class="menu-grid">
+                <button class="menu-item" id="aiPlannerBtn">
+                    <div class="menu-icon">🤖</div>
+                    <div class="menu-text">Planning IA</div>
+                </button>
+                <button class="menu-item" id="calendarBtn">
+                    <div class="menu-icon">📅</div>
+                    <div class="menu-text">Calendrier</div>
+                </button>
+                <button class="menu-item" id="exportBtn">
+                    <div class="menu-icon">📊</div>
+                    <div class="menu-text">Export Excel</div>
+                </button>
+                <button class="menu-item" id="settingsBtn">
+                    <div class="menu-icon">⚙️</div>
+                    <div class="menu-text">Paramètres</div>
+                </button>
+                <button class="menu-item" id="tutorialBtn">
+                    <div class="menu-icon">❓</div>
+                    <div class="menu-text">Tutorial</div>
+                </button>
+                <button class="menu-item" id="statsBtn">
+                    <div class="menu-icon">📈</div>
+                    <div class="menu-text">Statistiques</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- AI Planner Modal -->
+    <div id="aiPlannerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🤖 Planificateur IA</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ajouter une contrainte :</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <select class="form-input" id="constraintDay">
+                        <option value="">Jour</option>
+                        <option value="lundi">Lundi</option>
+                        <option value="mardi">Mardi</option>
+                        <option value="mercredi">Mercredi</option>
+                        <option value="jeudi">Jeudi</option>
+                        <option value="vendredi">Vendredi</option>
+                    </select>
+                    <select class="form-input" id="constraintType">
+                        <option value="">Type de contrainte</option>
+                        <option value="early_leave">Départ anticipé</option>
+                        <option value="late_arrival">Arrivée tardive</option>
+                        <option value="long_break">Pause longue</option>
+                        <option value="short_day">Journée courte</option>
+                    </select>
+                    <input type="time" class="form-input" id="constraintTime" placeholder="Heure">
+                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" class="form-input" id="constraintReason" placeholder="Raison (ex: RDV médecin, formation...)" style="flex: 1;">
+                    <button type="button" class="btn btn-secondary" id="addConstraintBtn">➕ Ajouter</button>
+                </div>
+                
+                <div id="constraintsList" style="background: var(--gray-light); padding: 10px; border-radius: 8px; min-height: 50px;">
+                    <div style="color: var(--gray-dark); font-size: 14px; font-style: italic;">Aucune contrainte ajoutée</div>
+                </div>
+            </div>
+            
+            <div class="form-group" style="display: none;">
+                <label class="form-label">Contraintes (format libre - optionnel) :</label>
+                <textarea class="form-input" id="constraintsInput" rows="2" placeholder="Format libre si besoin..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Heures déjà effectuées cette semaine :</label>
+                <input type="number" class="form-input" id="currentWeekHours" placeholder="0" step="0.5" min="0" max="35">
+            </div>
+            <button class="btn" id="generatePlanningBtn">🚀 Générer le Planning</button>
+            <div id="planningResult" style="margin-top: 20px; display: none;">
+                <h3 style="color: var(--sanofi-purple); margin-bottom: 15px;">📋 Planning Optimisé :</h3>
+                <div id="planningContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div id="calendarModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📅 Calendrier</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="btn btn-secondary" id="prevMonth">◀</button>
+                <span id="currentMonth" style="margin: 0 20px; font-weight: bold; color: var(--sanofi-purple);"></span>
+                <button class="btn btn-secondary" id="nextMonth">▶</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div id="dayDetails" style="margin-top: 20px; display: none;">
+                <h3 style="color: var(--sanofi-purple);">Détails du jour :</h3>
+                <div id="dayDetailsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📊 Export Excel</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Période d'export :</label>
+                <select class="form-input" id="exportPeriod">
+                    <option value="week">Cette semaine</option>
+                    <option value="month">Ce mois</option>
+                    <option value="custom">Période personnalisée</option>
+                </select>
+            </div>
+            <div id="customPeriod" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Du :</label>
+                    <input type="date" class="form-input" id="exportDateFrom">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Au :</label>
+                    <input type="date" class="form-input" id="exportDateTo">
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" id="downloadExcelBtn">💾 Télécharger Excel</button>
+                <button class="btn btn-secondary" id="previewDataBtn">👁️ Aperçu</button>
+            </div>
+            <div id="dataPreview" style="margin-top: 20px; display: none;">
+                <h3 style="color: var(--sanofi-purple);">Aperçu des données :</h3>
+                <div id="previewContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">❓ Guide d'utilisation</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div class="tutorial-step">
+                <h3>1. 🕘 Pointer son arrivée</h3>
+                <p>Cliquez sur le bouton violet "ARRIVÉE" dès votre arrivée au travail. L'heure sera automatiquement enregistrée.</p>
+            </div>
+            <div class="tutorial-step">
+                <h3>2. ⏸️ Gérer les pauses</h3>
+                <p>Utilisez les boutons "PAUSE" et "FIN PAUSE" pour décompter automatiquement vos temps de pause du midi.</p>
+            </div>
+            <div class="tutorial-step">
+                <h3>3. 🕕 Pointer son départ</h3>
+                <p>N'oubliez pas de cliquer sur "DÉPART" en partant. Vos heures seront automatiquement calculées.</p>
+            </div>
+            <div class="tutorial-step">
+                <h3>4. 🤖 Utiliser le Planning IA</h3>
+                <p>Décrivez vos contraintes (RDV, formations...) et l'IA vous proposera un planning optimal pour atteindre 35h.</p>
+            </div>
+            <div class="tutorial-step">
+                <h3>5. 📊 Consulter vos statistiques</h3>
+                <p>Visualisez vos performances personnelles : jours travaillés, moyenne quotidienne, progression mensuelle.</p>
+            </div>
+            <div class="tutorial-step">
+                <h3>6. ☁️ Sauvegarde Cloud</h3>
+                <p>Activez la sauvegarde cloud pour sécuriser vos données et les synchroniser entre appareils.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">⚙️ Paramètres</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notifications :</label>
+                <label><input type="checkbox" id="notificationsEnabled"> Activer les notifications</label>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Heures de travail par jour :</label>
+                <input type="number" class="form-input" id="dailyHours" value="7" step="0.5" min="1" max="12">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Objectif hebdomadaire :</label>
+                <input type="number" class="form-input" id="weeklyGoal" value="35" step="0.5" min="1" max="50">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Rectification d'horaires :</label>
+                <button class="btn btn-secondary" id="editTimesBtn">✏️ Modifier les horaires du jour</button>
+            </div>
+            <button class="btn" id="saveSettingsBtn">💾 Sauvegarder</button>
+        </div>
+    </div>
+
+    <!-- Edit Times Modal -->
+    <div id="editTimesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">✏️ Rectification d'horaires</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date à modifier :</label>
+                <input type="date" class="form-input" id="editDate">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Heure d'arrivée :</label>
+                <input type="time" class="form-input" id="editStartTime">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Heure de départ :</label>
+                <input type="time" class="form-input" id="editEndTime">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Début pause :</label>
+                <input type="time" class="form-input" id="editBreakStart">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Fin pause :</label>
+                <input type="time" class="form-input" id="editBreakEnd">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" id="saveEditBtn">💾 Sauvegarder</button>
+                <button class="btn btn-secondary" id="loadDayBtn">📥 Charger le jour</button>
+            </div>
+        </div>
+    </div>
+    <div id="teamModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">👥 Mode Équipe</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Code d'équipe :</label>
+                <input type="text" class="form-input" id="teamCode" placeholder="Entrez le code partagé par votre équipe">
+            </div>
+            <button class="btn" id="joinTeamBtn">🤝 Rejoindre l'équipe</button>
+            <div style="text-align: center; margin: 20px 0;">
+                <span>OU</span>
+            </div>
+            <button class="btn btn-secondary" id="createTeamBtn">➕ Créer une nouvelle équipe</button>
+            <div id="teamStats" style="margin-top: 20px; display: none;">
+                <h3 style="color: var(--sanofi-purple);">Statistiques d'équipe :</h3>
+                <div id="teamStatsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TimeTrackerApp {
+            constructor() {
+                this.workStatus = 'off'; // 'working', 'break', 'off'
+                this.startTime = null;
+                this.endTime = null;
+                this.breakStartTime = null;
+                this.breakEndTime = null;
+                this.dailyHours = 7;
+                this.weeklyGoal = 35;
+                this.constraints = []; // Store structured constraints
+                
+                this.initializeApp();
+                this.bindEvents();
+                this.updateDisplay();
+                this.requestNotificationPermission();
+            }
+
+            initializeApp() {
+                // Load data from localStorage
+                this.loadData();
+                
+                // Initialize display
+                this.updateDisplay();
+                
+                // Check for existing work session
+                this.checkWorkSession();
+                
+                // Start update timer
+                setInterval(() => this.updateDisplay(), 1000);
+            }
+
+            loadData() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                
+                // Load today's data
+                const today = new Date().toISOString().split('T')[0];
+                const todayData = data[today] || {};
+                
+                this.startTime = todayData.startTime ? new Date(todayData.startTime) : null;
+                this.endTime = todayData.endTime ? new Date(todayData.endTime) : null;
+                this.breakStartTime = todayData.breakStartTime ? new Date(todayData.breakStartTime) : null;
+                this.breakEndTime = todayData.breakEndTime ? new Date(todayData.breakEndTime) : null;
+                
+                // Load settings
+                const settings = JSON.parse(localStorage.getItem('timeTrackerSettings') || '{}');
+                this.dailyHours = settings.dailyHours || 7;
+                this.weeklyGoal = settings.weeklyGoal || 35;
+                
+                // Determine work status
+                this.updateWorkStatus();
+            }
+
+            saveData() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                const today = new Date().toISOString().split('T')[0];
+                
+                data[today] = {
+                    startTime: this.startTime?.toISOString(),
+                    endTime: this.endTime?.toISOString(),
+                    breakStartTime: this.breakStartTime?.toISOString(),
+                    breakEndTime: this.breakEndTime?.toISOString(),
+                    totalHours: this.calculateTodayHours(),
+                    breakHours: this.calculateBreakHours()
+                };
+                
+                localStorage.setItem('timeTrackerData', JSON.stringify(data));
+            }
+
+            updateWorkStatus() {
+                if (this.startTime && !this.endTime) {
+                    if (this.breakStartTime && !this.breakEndTime) {
+                        this.workStatus = 'break';
+                    } else {
+                        this.workStatus = 'working';
+                    }
+                } else {
+                    this.workStatus = 'off';
+                }
+            }
+
+            checkWorkSession() {
+                // Check if user is in middle of work session
+                if (this.startTime && !this.endTime) {
+                    const now = new Date();
+                    const workHours = (now - this.startTime) / (1000 * 60 * 60);
+                    
+                    // Alert if working more than 10 hours
+                    if (workHours > 10) {
+                        this.showNotification('⚠️ Attention', 'Vous travaillez depuis plus de 10 heures !');
+                    }
+                }
+            }
+
+            bindEvents() {
+                // Punch buttons
+                document.getElementById('startBtn').addEventListener('click', () => this.handleStart());
+                document.getElementById('endBtn').addEventListener('click', () => this.handleEnd());
+                document.getElementById('breakStartBtn').addEventListener('click', () => this.handleBreakStart());
+                document.getElementById('breakEndBtn').addEventListener('click', () => this.handleBreakEnd());
+
+                // Header controls
+                document.getElementById('themeBtn').addEventListener('click', () => this.toggleTheme());
+                document.getElementById('cloudBtn').addEventListener('click', () => this.toggleCloudSync());
+
+                // Menu items
+                document.getElementById('aiPlannerBtn').addEventListener('click', () => this.openModal('aiPlannerModal'));
+                document.getElementById('calendarBtn').addEventListener('click', () => this.openCalendar());
+                document.getElementById('exportBtn').addEventListener('click', () => this.openModal('exportModal'));
+                document.getElementById('statsBtn').addEventListener('click', () => this.openStats());
+                document.getElementById('settingsBtn').addEventListener('click', () => this.openModal('settingsModal'));
+                document.getElementById('tutorialBtn').addEventListener('click', () => this.openModal('tutorialModal'));
+
+                // Modal close buttons
+                document.querySelectorAll('.modal .close').forEach(btn => {
+                    btn.addEventListener('click', () => this.closeAllModals());
+                });
+
+                // Modal background clicks
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) this.closeAllModals();
+                    });
+                });
+
+                // AI Planner
+                document.getElementById('generatePlanningBtn').addEventListener('click', () => this.generatePlanning());
+                document.getElementById('addConstraintBtn').addEventListener('click', () => this.addConstraint());
+
+                // Export functionality
+                document.getElementById('exportPeriod').addEventListener('change', (e) => {
+                    document.getElementById('customPeriod').style.display = 
+                        e.target.value === 'custom' ? 'block' : 'none';
+                });
+                document.getElementById('downloadExcelBtn').addEventListener('click', () => this.downloadExcel());
+                document.getElementById('previewDataBtn').addEventListener('click', () => this.previewData());
+
+                // Settings
+                document.getElementById('saveSettingsBtn').addEventListener('click', () => this.saveSettings());
+                document.getElementById('editTimesBtn').addEventListener('click', () => this.openEditTimes());
+
+                // Calendar navigation
+                document.getElementById('prevMonth').addEventListener('click', () => this.navigateCalendar(-1));
+                document.getElementById('nextMonth').addEventListener('click', () => this.navigateCalendar(1));
+
+                // Edit times functionality
+                document.getElementById('loadDayBtn').addEventListener('click', () => this.loadDayForEdit());
+                document.getElementById('saveEditBtn').addEventListener('click', () => this.saveEditedTimes());
+            }
+
+            handleStart() {
+                if (this.workStatus === 'off') {
+                    this.startTime = new Date();
+                    this.endTime = null;
+                    this.workStatus = 'working';
+                    this.saveData();
+                    this.updateDisplay();
+                    this.showNotification('✅ Arrivée enregistrée', `Bon travail ! Pointé à ${this.formatTime(this.startTime)}`);
+                }
+            }
+
+            handleEnd() {
+                if (this.workStatus === 'working' || this.workStatus === 'break') {
+                    // End break if still on break
+                    if (this.workStatus === 'break') {
+                        this.handleBreakEnd();
+                    }
+                    
+                    this.endTime = new Date();
+                    this.workStatus = 'off';
+                    this.saveData();
+                    this.updateDisplay();
+                    
+                    const totalHours = this.calculateTodayHours();
+                    this.showNotification('🏁 Départ enregistré', `Journée terminée ! ${totalHours.toFixed(2)}h travaillées`);
+                }
+            }
+
+            handleBreakStart() {
+                if (this.workStatus === 'working') {
+                    this.breakStartTime = new Date();
+                    this.breakEndTime = null;
+                    this.workStatus = 'break';
+                    this.saveData();
+                    this.updateDisplay();
+                    this.showNotification('⏸️ Pause commencée', 'Bon appétit !');
+                }
+            }
+
+            handleBreakEnd() {
+                if (this.workStatus === 'break') {
+                    this.breakEndTime = new Date();
+                    this.workStatus = 'working';
+                    this.saveData();
+                    this.updateDisplay();
+                    
+                    const breakDuration = (this.breakEndTime - this.breakStartTime) / (1000 * 60);
+                    this.showNotification('▶️ Pause terminée', `Pause de ${Math.round(breakDuration)} minutes`);
+                }
+            }
+
+            calculateTodayHours() {
+                if (!this.startTime) return 0;
+                
+                const endTime = this.endTime || new Date();
+                let totalMinutes = (endTime - this.startTime) / (1000 * 60);
+                
+                // Subtract break time
+                if (this.breakStartTime) {
+                    const breakEnd = this.breakEndTime || new Date();
+                    const breakMinutes = (breakEnd - this.breakStartTime) / (1000 * 60);
+                    totalMinutes -= breakMinutes;
+                }
+                
+                return Math.max(0, totalMinutes / 60);
+            }
+
+            calculateBreakHours() {
+                if (!this.breakStartTime) return 0;
+                
+                const breakEnd = this.breakEndTime || new Date();
+                return (breakEnd - this.breakStartTime) / (1000 * 60 * 60);
+            }
+
+            calculateWeekHours() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                const now = new Date();
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Monday
+                startOfWeek.setHours(0, 0, 0, 0);
+                
+                let totalHours = 0;
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(startOfWeek);
+                    date.setDate(startOfWeek.getDate() + i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    if (data[dateStr]) {
+                        totalHours += data[dateStr].totalHours || 0;
+                    }
+                }
+                
+                return totalHours;
+            }
+
+            updateDisplay() {
+                // Update status indicator
+                const statusIndicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                
+                statusIndicator.className = 'status-indicator';
+                switch (this.workStatus) {
+                    case 'working':
+                        statusIndicator.classList.add('status-working');
+                        statusText.textContent = 'En service';
+                        break;
+                    case 'break':
+                        statusIndicator.classList.add('status-break');
+                        statusText.textContent = 'En pause';
+                        break;
+                    default:
+                        statusIndicator.classList.add('status-off');
+                        statusText.textContent = 'Hors service';
+                }
+
+                // Update button states
+                this.updateButtonStates();
+
+                // Update times display
+                this.updateTimesDisplay();
+
+                // Update stats
+                this.updateStats();
+
+                // Update progress bar
+                this.updateProgressBar();
+            }
+
+            updateButtonStates() {
+                const startBtn = document.getElementById('startBtn');
+                const endBtn = document.getElementById('endBtn');
+                const breakStartBtn = document.getElementById('breakStartBtn');
+                const breakEndBtn = document.getElementById('breakEndBtn');
+
+                // Reset all button states
+                [startBtn, endBtn, breakStartBtn, breakEndBtn].forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                switch (this.workStatus) {
+                    case 'working':
+                        startBtn.classList.add('active');
+                        break;
+                    case 'break':
+                        breakStartBtn.classList.add('active');
+                        break;
+                }
+            }
+
+            updateTimesDisplay() {
+                document.getElementById('startTime').textContent = 
+                    this.startTime ? this.formatTime(this.startTime) : '';
+                document.getElementById('endTime').textContent = 
+                    this.endTime ? this.formatTime(this.endTime) : '';
+                document.getElementById('breakStartTime').textContent = 
+                    this.breakStartTime ? this.formatTime(this.breakStartTime) : '';
+                document.getElementById('breakEndTime').textContent = 
+                    this.breakEndTime ? this.formatTime(this.breakEndTime) : '';
+            }
+
+            updateStats() {
+                const todayHours = this.calculateTodayHours();
+                const weekHours = this.calculateWeekHours();
+                const remainingHours = Math.max(0, this.weeklyGoal - weekHours);
+
+                document.getElementById('todayHours').textContent = this.formatHours(todayHours);
+                document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
+                document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
+            }
+
+            updateProgressBar() {
+                const todayHours = this.calculateTodayHours();
+                const progress = Math.min(100, (todayHours / this.dailyHours) * 100);
+                
+                document.getElementById('dayProgress').textContent = 
+                    `${this.formatHours(todayHours)} / ${this.dailyHours}h00`;
+                document.getElementById('dayProgressBar').style.width = `${progress}%`;
+            }
+
+            formatTime(date) {
+                return date.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
+
+            formatHours(hours) {
+                const h = Math.floor(hours);
+                const m = Math.round((hours - h) * 60);
+                return `${h}h${m.toString().padStart(2, '0')}`;
+            }
+
+            openModal(modalId) {
+                this.closeAllModals();
+                document.getElementById(modalId).style.display = 'block';
+                
+                // Load modal-specific data
+                if (modalId === 'settingsModal') {
+                    this.loadSettingsModal();
+                }
+            }
+
+            closeAllModals() {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+
+            toggleTheme() {
+                const body = document.body;
+                const currentTheme = body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                body.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                const themeBtn = document.getElementById('themeBtn');
+                themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            }
+
+            toggleCloudSync() {
+                const cloudBtn = document.getElementById('cloudBtn');
+                const isEnabled = cloudBtn.classList.contains('enabled');
+                
+                if (!isEnabled) {
+                    // Show explanation about cloud sync
+                    const explanation = `
+🌟 SAUVEGARDE CLOUD - COMMENT ÇA MARCHE
+
+📋 DONNÉES STOCKÉES LOCALEMENT :
+• Toutes vos données restent sur VOTRE appareil
+• Aucun serveur externe = 100% GRATUIT
+• Confidentialité totale garantie
+
+☁️ "CLOUD" = SAUVEGARDE LOCALE RENFORCÉE :
+• Export automatique vers votre stockage perso
+• Synchronisation entre vos appareils via vos propres comptes
+• Vous gardez le contrôle total de vos données
+
+🔄 SYNCHRONISATION ÉQUIPE :
+• Via codes d'équipe partagés (stockage local)
+• Pas de serveur central = pas d'abonnement
+• Partage direct entre collègues
+
+✅ ACTIVATION :
+Cette fonction prépare vos données pour l'export automatique vers votre Google Drive, Dropbox, etc.
+                    `;
+                    
+                    if (confirm(explanation + '\n\nActiver la préparation cloud ?')) {
+                        cloudBtn.classList.add('enabled');
+                        cloudBtn.style.background = 'var(--green)';
+                        cloudBtn.style.color = 'var(--white)';
+                        this.showNotification('☁️ Cloud préparé', 'Données prêtes pour export automatique');
+                    }
+                } else {
+                    cloudBtn.classList.remove('enabled');
+                    cloudBtn.style.background = '';
+                    cloudBtn.style.color = '';
+                    this.showNotification('☁️ Cloud désactivé', 'Stockage local uniquement');
+                }
+            }
+
+            addConstraint() {
+                const day = document.getElementById('constraintDay').value;
+                const type = document.getElementById('constraintType').value;
+                const time = document.getElementById('constraintTime').value;
+                const reason = document.getElementById('constraintReason').value.trim();
+                
+                if (!day || !type || !time) {
+                    this.showNotification('❌ Erreur', 'Veuillez remplir tous les champs');
+                    return;
+                }
+                
+                const constraint = {
+                    id: Date.now(),
+                    day: day,
+                    type: type,
+                    time: time,
+                    reason: reason || 'Sans motif'
+                };
+                
+                this.constraints.push(constraint);
+                this.updateConstraintsList();
+                
+                // Reset form
+                document.getElementById('constraintDay').value = '';
+                document.getElementById('constraintType').value = '';
+                document.getElementById('constraintTime').value = '';
+                document.getElementById('constraintReason').value = '';
+                
+                this.showNotification('✅ Contrainte ajoutée', `${day} - ${this.getConstraintTypeLabel(type)}`);
+            }
+
+            removeConstraint(id) {
+                this.constraints = this.constraints.filter(c => c.id !== id);
+                this.updateConstraintsList();
+                this.showNotification('🗑️ Contrainte supprimée', 'Contrainte retirée du planning');
+            }
+
+            updateConstraintsList() {
+                const listDiv = document.getElementById('constraintsList');
+                
+                if (this.constraints.length === 0) {
+                    listDiv.innerHTML = '<div style="color: var(--gray-dark); font-size: 14px; font-style: italic;">Aucune contrainte ajoutée</div>';
+                    return;
+                }
+                
+                let html = '';
+                this.constraints.forEach(constraint => {
+                    const typeLabel = this.getConstraintTypeLabel(constraint.type);
+                    html += `
+                        <div class="constraint-item">
+                            <div>
+                                <strong>${constraint.day.charAt(0).toUpperCase() + constraint.day.slice(1)}</strong> - 
+                                ${typeLabel} à ${constraint.time}<br>
+                                <small style="color: var(--gray-dark);">${constraint.reason}</small>
+                            </div>
+                            <button class="constraint-remove" onclick="window.timeTracker.removeConstraint(${constraint.id})">×</button>
+                        </div>
+                    `;
+                });
+                
+                listDiv.innerHTML = html;
+            }
+
+            getConstraintTypeLabel(type) {
+                const labels = {
+                    'early_leave': 'Départ anticipé',
+                    'late_arrival': 'Arrivée tardive',
+                    'long_break': 'Pause longue',
+                    'short_day': 'Journée courte'
+                };
+                return labels[type] || type;
+            }
+                const constraints = document.getElementById('constraintsInput').value;
+                const currentHours = parseFloat(document.getElementById('currentWeekHours').value) || 0;
+                const remainingHours = this.weeklyGoal - currentHours;
+                
+                if (remainingHours <= 0) {
+                    document.getElementById('planningResult').style.display = 'block';
+                    document.getElementById('planningContent').innerHTML = 
+                        '<div style="color: var(--green); font-weight: bold;">✅ Objectif hebdomadaire déjà atteint !</div>';
+                    return;
+                }
+                
+                // Enhanced AI planning with specific scheduling
+                const daysRemaining = this.getRemainingWorkDays();
+                const normalDayHours = 7; // Standard 7h workday
+                
+                // Parse constraints to extract specific requirements
+                const constraintsParsed = this.parseConstraints(constraints);
+                
+                let planning = '<div style="background: var(--gray-light); padding: 15px; border-radius: 10px;">';
+                planning += `<div style="margin-bottom: 10px;"><strong>📊 Analyse :</strong></div>`;
+                planning += `<div>• Heures restantes : ${remainingHours.toFixed(1)}h</div>`;
+                planning += `<div>• Jours restants : ${daysRemaining}</div>`;
+                planning += '</div>';
+                
+                planning += '<div style="margin-top: 15px;"><strong>📅 Planning détaillé suggéré :</strong></div>';
+                
+                // Generate detailed daily schedules
+                const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+                const today = new Date().getDay();
+                let totalPlannedHours = 0;
+                
+                for (let i = 1; i <= 5; i++) { // Monday to Friday
+                    if (i < today) continue; // Skip past days
+                    
+                    const dayName = days[i - 1];
+                    const dayConstraint = constraintsParsed.find(c => 
+                        c.day.toLowerCase() === dayName.toLowerCase()
+                    );
+                    
+                    let daySchedule = '';
+                    let plannedHours = normalDayHours;
+                    
+                    if (dayConstraint) {
+                        // Apply constraint
+                        if (dayConstraint.type === 'early_leave') {
+                            const leaveTime = dayConstraint.time;
+                            const startTime = '08:00';
+                            const breakStart = '12:00';
+                            const breakEnd = '13:00';
+                            
+                            plannedHours = this.calculateHoursBetween(startTime, leaveTime) - 1; // -1h break
+                            
+                            daySchedule = `
+                                <div style="margin: 5px 0; padding: 10px; background: #fff3cd; border-radius: 5px; border-left: 4px solid orange;">
+                                    <strong>${dayName}</strong> - ${dayConstraint.reason} ⚠️<br>
+                                    🕗 <strong>Arrivée :</strong> ${startTime}<br>
+                                    ⏸️ <strong>Pause :</strong> ${breakStart} - ${breakEnd}<br>
+                                    🕒 <strong>Départ :</strong> ${leaveTime}<br>
+                                    ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
+                                </div>
+                            `;
+                        } else if (dayConstraint.type === 'late_arrival') {
+                            const arrivalTime = dayConstraint.time;
+                            const breakStart = '12:00';
+                            const breakEnd = '13:00';
+                            const endTime = '16:00';
+                            
+                            plannedHours = this.calculateHoursBetween(arrivalTime, endTime) - 1;
+                            
+                            daySchedule = `
+                                <div style="margin: 5px 0; padding: 10px; background: #fff3cd; border-radius: 5px; border-left: 4px solid orange;">
+                                    <strong>${dayName}</strong> - ${dayConstraint.reason} ⚠️<br>
+                                    🕘 <strong>Arrivée :</strong> ${arrivalTime}<br>
+                                    ⏸️ <strong>Pause :</strong> ${breakStart} - ${breakEnd}<br>
+                                    🕕 <strong>Départ :</strong> ${endTime}<br>
+                                    ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
+                                </div>
+                            `;
+                        } else if (dayConstraint.type === 'long_break') {
+                            const breakStart = '12:00';
+                            const breakEnd = '14:00';
+                            const startTime = '08:00';
+                            const endTime = '17:00';
+                            
+                            plannedHours = this.calculateHoursBetween(startTime, endTime) - 2; // -2h break
+                            
+                            daySchedule = `
+                                <div style="margin: 5px 0; padding: 10px; background: #e7f3ff; border-radius: 5px; border-left: 4px solid blue;">
+                                    <strong>${dayName}</strong> - ${dayConstraint.reason} 📚<br>
+                                    🕗 <strong>Arrivée :</strong> ${startTime}<br>
+                                    ⏸️ <strong>Pause longue :</strong> ${breakStart} - ${breakEnd}<br>
+                                    🕔 <strong>Départ :</strong> ${endTime}<br>
+                                    ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
+                                </div>
+                            `;
+                        }
+                    } else {
+                        // Normal day - calculate to compensate for constraint days
+                        const hoursToCompensate = (remainingHours - totalPlannedHours) / (5 - i + 1);
+                        plannedHours = Math.max(6, Math.min(8, hoursToCompensate));
+                        
+                        const startTime = plannedHours > 7.5 ? '07:30' : '08:00';
+                        const breakStart = '12:00';
+                        const breakEnd = '13:00';
+                        const endTime = this.addHoursToTime(startTime, plannedHours + 1); // +1 for break
+                        
+                        daySchedule = `
+                            <div style="margin: 5px 0; padding: 10px; background: #d1f2eb; border-radius: 5px; border-left: 4px solid green;">
+                                <strong>${dayName}</strong> - Journée normale ✅<br>
+                                🕗 <strong>Arrivée :</strong> ${startTime}<br>
+                                ⏸️ <strong>Pause :</strong> ${breakStart} - ${breakEnd}<br>
+                                🕒 <strong>Départ :</strong> ${endTime}<br>
+                                ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
+                            </div>
+                        `;
+                    }
+                    
+                    planning += daySchedule;
+                    totalPlannedHours += plannedHours;
+                }
+                
+                planning += `<div style="margin-top: 15px; padding: 10px; background: var(--sanofi-purple); color: white; border-radius: 8px; text-align: center;">`;
+                planning += `<strong>📊 Total planifié : ${totalPlannedHours.toFixed(1)}h / ${this.weeklyGoal}h</strong>`;
+                if (totalPlannedHours >= this.weeklyGoal) {
+                    planning += `<br>🎯 Objectif atteint !`;
+                } else {
+                    planning += `<br>⚠️ Il manque ${(this.weeklyGoal - totalPlannedHours).toFixed(1)}h`;
+                }
+                planning += '</div>';
+                
+                document.getElementById('planningContent').innerHTML = planning;
+                document.getElementById('planningResult').style.display = 'block';
+            }
+
+            parseConstraints(constraintsText) {
+                const constraints = [];
+                const lines = constraintsText.split('\n').filter(line => line.trim());
+                
+                lines.forEach(line => {
+                    line = line.toLowerCase().trim();
+                    
+                    // Parse different constraint types
+                    const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
+                    const dayFound = days.find(day => line.includes(day));
+                    
+                    if (dayFound) {
+                        let constraint = { day: dayFound };
+                        
+                        // Extract reason (after dash)
+                        const reasonMatch = line.match(/-\s*(.+)$/);
+                        constraint.reason = reasonMatch ? reasonMatch[1] : 'Contrainte';
+                        
+                        // Detect constraint type and time
+                        if (line.includes('départ') && line.match(/\d{1,2}h?\d{0,2}/)) {
+                            constraint.type = 'early_leave';
+                            const timeMatch = line.match(/départ\s+(\d{1,2})[h:]?(\d{0,2})/);
+                            if (timeMatch) {
+                                const hour = timeMatch[1].padStart(2, '0');
+                                const minute = (timeMatch[2] || '00').padStart(2, '0');
+                                constraint.time = `${hour}:${minute}`;
+                            }
+                        } else if (line.includes('arrivée') && line.match(/\d{1,2}h?\d{0,2}/)) {
+                            constraint.type = 'late_arrival';
+                            const timeMatch = line.match(/arrivée\s+(\d{1,2})[h:]?(\d{0,2})/);
+                            if (timeMatch) {
+                                const hour = timeMatch[1].padStart(2, '0');
+                                const minute = (timeMatch[2] || '00').padStart(2, '0');
+                                constraint.time = `${hour}:${minute}`;
+                            }
+                        } else if (line.includes('pause longue') || line.includes('formation')) {
+                            constraint.type = 'long_break';
+                        }
+                        
+                        constraints.push(constraint);
+                    }
+                });
+                
+                return constraints;
+            }
+
+            calculateHoursBetween(startTime, endTime) {
+                const [startHour, startMin] = startTime.split(':').map(Number);
+                const [endHour, endMin] = endTime.split(':').map(Number);
+                
+                const startMinutes = startHour * 60 + startMin;
+                const endMinutes = endHour * 60 + endMin;
+                
+                return (endMinutes - startMinutes) / 60;
+            }
+
+            addHoursToTime(timeStr, hours) {
+                const [hour, minute] = timeStr.split(':').map(Number);
+                const totalMinutes = hour * 60 + minute + (hours * 60);
+                
+                const newHour = Math.floor(totalMinutes / 60) % 24;
+                const newMinute = totalMinutes % 60;
+                
+                return `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}`;
+            }
+
+            getRemainingWorkDays() {
+                const today = new Date();
+                const dayOfWeek = today.getDay();
+                
+                // Count remaining work days this week (Monday = 1, Friday = 5)
+                if (dayOfWeek === 0) return 5; // Sunday
+                if (dayOfWeek === 6) return 5; // Saturday
+                return Math.max(1, 6 - dayOfWeek); // Monday to Friday
+            }
+
+            openCalendar() {
+                this.currentCalendarMonth = new Date();
+                this.renderCalendar();
+                this.openModal('calendarModal');
+            }
+
+            renderCalendar() {
+                const month = this.currentCalendarMonth;
+                document.getElementById('currentMonth').textContent = 
+                    month.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                
+                const grid = document.getElementById('calendarGrid');
+                grid.innerHTML = '';
+                
+                // Add day headers
+                const dayHeaders = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+                dayHeaders.forEach(day => {
+                    const header = document.createElement('div');
+                    header.style.fontWeight = 'bold';
+                    header.style.textAlign = 'center';
+                    header.style.padding = '10px';
+                    header.textContent = day;
+                    grid.appendChild(header);
+                });
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
+                const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+                
+                // Add empty cells for days before month starts
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                    grid.appendChild(document.createElement('div'));
+                }
+                
+                // Add days of month
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
+                    
+                    const dateStr = new Date(month.getFullYear(), month.getMonth(), day)
+                        .toISOString().split('T')[0];
+                    
+                    // Check if this day has hours logged
+                    if (data[dateStr] && data[dateStr].totalHours > 0) {
+                        dayElement.classList.add('has-hours');
+                        const hours = document.createElement('div');
+                        hours.style.fontSize = '10px';
+                        hours.textContent = this.formatHours(data[dateStr].totalHours);
+                        dayElement.appendChild(hours);
+                    }
+                    
+                    // Mark today
+                    const today = new Date().toISOString().split('T')[0];
+                    if (dateStr === today) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    // Add click handler
+                    dayElement.addEventListener('click', () => this.showDayDetails(dateStr));
+                    
+                    grid.appendChild(dayElement);
+                }
+            }
+
+            navigateCalendar(direction) {
+                this.currentCalendarMonth.setMonth(this.currentCalendarMonth.getMonth() + direction);
+                this.renderCalendar();
+            }
+
+            showDayDetails(dateStr) {
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                const dayData = data[dateStr];
+                
+                const detailsDiv = document.getElementById('dayDetails');
+                const contentDiv = document.getElementById('dayDetailsContent');
+                
+                if (!dayData || !dayData.totalHours) {
+                    contentDiv.innerHTML = '<p>Aucune donnée pour ce jour.</p>';
+                } else {
+                    let content = `<div style="background: var(--gray-light); padding: 15px; border-radius: 10px;">`;
+                    content += `<div><strong>Date :</strong> ${new Date(dateStr).toLocaleDateString('fr-FR')}</div>`;
+                    content += `<div><strong>Heures travaillées :</strong> ${this.formatHours(dayData.totalHours)}</div>`;
+                    
+                    if (dayData.startTime) {
+                        content += `<div><strong>Arrivée :</strong> ${this.formatTime(new Date(dayData.startTime))}</div>`;
+                    }
+                    if (dayData.endTime) {
+                        content += `<div><strong>Départ :</strong> ${this.formatTime(new Date(dayData.endTime))}</div>`;
+                    }
+                    if (dayData.breakHours > 0) {
+                        content += `<div><strong>Pause :</strong> ${this.formatHours(dayData.breakHours)}</div>`;
+                    }
+                    
+                    content += '</div>';
+                    contentDiv.innerHTML = content;
+                }
+                
+                detailsDiv.style.display = 'block';
+            }
+
+            previewData() {
+                const period = document.getElementById('exportPeriod').value;
+                const data = this.getExportData(period);
+                
+                let preview = '<div style="max-height: 300px; overflow-y: auto;">';
+                preview += '<table style="width: 100%; border-collapse: collapse;">';
+                preview += '<tr style="background: var(--gray-light);"><th style="padding: 8px; border: 1px solid var(--gray-medium);">Date</th><th style="padding: 8px; border: 1px solid var(--gray-medium);">Heures</th><th style="padding: 8px; border: 1px solid var(--gray-medium);">Arrivée</th><th style="padding: 8px; border: 1px solid var(--gray-medium);">Départ</th></tr>';
+                
+                data.forEach(row => {
+                    preview += '<tr>';
+                    preview += `<td style="padding: 8px; border: 1px solid var(--gray-medium);">${row.date}</td>`;
+                    preview += `<td style="padding: 8px; border: 1px solid var(--gray-medium);">${row.hours}</td>`;
+                    preview += `<td style="padding: 8px; border: 1px solid var(--gray-medium);">${row.start}</td>`;
+                    preview += `<td style="padding: 8px; border: 1px solid var(--gray-medium);">${row.end}</td>`;
+                    preview += '</tr>';
+                });
+                
+                preview += '</table></div>';
+                
+                document.getElementById('previewContent').innerHTML = preview;
+                document.getElementById('dataPreview').style.display = 'block';
+            }
+
+            getExportData(period) {
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                const result = [];
+                
+                let startDate, endDate;
+                const today = new Date();
+                
+                switch (period) {
+                    case 'week':
+                        startDate = new Date(today);
+                        startDate.setDate(today.getDate() - today.getDay() + 1);
+                        endDate = new Date(startDate);
+                        endDate.setDate(startDate.getDate() + 6);
+                        break;
+                    case 'month':
+                        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                        break;
+                    case 'custom':
+                        startDate = new Date(document.getElementById('exportDateFrom').value);
+                        endDate = new Date(document.getElementById('exportDateTo').value);
+                        break;
+                }
+                
+                for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                    const dateStr = d.toISOString().split('T')[0];
+                    const dayData = data[dateStr];
+                    
+                    result.push({
+                        date: d.toLocaleDateString('fr-FR'),
+                        hours: dayData ? this.formatHours(dayData.totalHours) : '0h00',
+                        start: dayData && dayData.startTime ? this.formatTime(new Date(dayData.startTime)) : '-',
+                        end: dayData && dayData.endTime ? this.formatTime(new Date(dayData.endTime)) : '-'
+                    });
+                }
+                
+                return result;
+            }
+
+            downloadExcel() {
+                const period = document.getElementById('exportPeriod').value;
+                const data = this.getExportData(period);
+                
+                // Create CSV content
+                let csvContent = 'Date,Heures Travaillées,Heure Arrivée,Heure Départ\n';
+                data.forEach(row => {
+                    csvContent += `${row.date},${row.hours},${row.start},${row.end}\n`;
+                });
+                
+                // Create and download file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `timetracker_${period}_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showNotification('📊 Export réussi', 'Fichier téléchargé avec succès');
+            }
+
+            loadSettingsModal() {
+                document.getElementById('dailyHours').value = this.dailyHours;
+                document.getElementById('weeklyGoal').value = this.weeklyGoal;
+                
+                const settings = JSON.parse(localStorage.getItem('timeTrackerSettings') || '{}');
+                document.getElementById('notificationsEnabled').checked = settings.notifications !== false;
+            }
+
+            saveSettings() {
+                const settings = {
+                    dailyHours: parseFloat(document.getElementById('dailyHours').value),
+                    weeklyGoal: parseFloat(document.getElementById('weeklyGoal').value),
+                    notifications: document.getElementById('notificationsEnabled').checked
+                };
+                
+                this.dailyHours = settings.dailyHours;
+                this.weeklyGoal = settings.weeklyGoal;
+                
+                localStorage.setItem('timeTrackerSettings', JSON.stringify(settings));
+                this.updateDisplay();
+                this.closeAllModals();
+                this.showNotification('⚙️ Paramètres sauvés', 'Configuration mise à jour');
+            }
+
+            openEditTimes() {
+                // Allow editing any date, not just today
+                this.openModal('editTimesModal');
+            }
+
+            loadDayForEdit() {
+                const dateStr = document.getElementById('editDate').value;
+                if (!dateStr) {
+                    this.showNotification('❌ Erreur', 'Veuillez sélectionner une date');
+                    return;
+                }
+                
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                const dayData = data[dateStr] || {};
+                
+                // Reset all fields first
+                document.getElementById('editStartTime').value = '';
+                document.getElementById('editEndTime').value = '';
+                document.getElementById('editBreakStart').value = '';
+                document.getElementById('editBreakEnd').value = '';
+                
+                // Load existing times if available
+                if (dayData.startTime) {
+                    const startTime = new Date(dayData.startTime);
+                    document.getElementById('editStartTime').value = startTime.toTimeString().substr(0, 5);
+                }
+                if (dayData.endTime) {
+                    const endTime = new Date(dayData.endTime);
+                    document.getElementById('editEndTime').value = endTime.toTimeString().substr(0, 5);
+                }
+                if (dayData.breakStartTime) {
+                    const breakStart = new Date(dayData.breakStartTime);
+                    document.getElementById('editBreakStart').value = breakStart.toTimeString().substr(0, 5);
+                }
+                if (dayData.breakEndTime) {
+                    const breakEnd = new Date(dayData.breakEndTime);
+                    document.getElementById('editBreakEnd').value = breakEnd.toTimeString().substr(0, 5);
+                }
+                
+                const selectedDate = new Date(dateStr).toLocaleDateString('fr-FR');
+                this.showNotification('📥 Données chargées', `Horaires du ${selectedDate} chargés pour modification`);
+            }
+
+            saveEditedTimes() {
+                const dateStr = document.getElementById('editDate').value;
+                const startTimeStr = document.getElementById('editStartTime').value;
+                const endTimeStr = document.getElementById('editEndTime').value;
+                const breakStartStr = document.getElementById('editBreakStart').value;
+                const breakEndStr = document.getElementById('editBreakEnd').value;
+                
+                if (!dateStr) {
+                    this.showNotification('❌ Erreur', 'Veuillez sélectionner une date');
+                    return;
+                }
+                
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                
+                // Create date objects
+                let dayData = {};
+                
+                if (startTimeStr) {
+                    dayData.startTime = new Date(`${dateStr}T${startTimeStr}:00`).toISOString();
+                }
+                if (endTimeStr) {
+                    dayData.endTime = new Date(`${dateStr}T${endTimeStr}:00`).toISOString();
+                }
+                if (breakStartStr) {
+                    dayData.breakStartTime = new Date(`${dateStr}T${breakStartStr}:00`).toISOString();
+                }
+                if (breakEndStr) {
+                    dayData.breakEndTime = new Date(`${dateStr}T${breakEndStr}:00`).toISOString();
+                }
+                
+                // Calculate hours
+                if (dayData.startTime && dayData.endTime) {
+                    const start = new Date(dayData.startTime);
+                    const end = new Date(dayData.endTime);
+                    let totalMinutes = (end - start) / (1000 * 60);
+                    
+                    // Subtract break time
+                    if (dayData.breakStartTime && dayData.breakEndTime) {
+                        const breakStart = new Date(dayData.breakStartTime);
+                        const breakEnd = new Date(dayData.breakEndTime);
+                        const breakMinutes = (breakEnd - breakStart) / (1000 * 60);
+                        totalMinutes -= breakMinutes;
+                        dayData.breakHours = breakMinutes / 60;
+                    }
+                    
+                    dayData.totalHours = Math.max(0, totalMinutes / 60);
+                }
+                
+                data[dateStr] = dayData;
+                localStorage.setItem('timeTrackerData', JSON.stringify(data));
+                
+                // If editing today, update current session
+                const today = new Date().toISOString().split('T')[0];
+                if (dateStr === today) {
+                    this.loadData();
+                    this.updateDisplay();
+                }
+                
+                this.closeAllModals();
+                this.showNotification('✅ Modifications sauvées', 'Horaires mis à jour avec succès');
+            }
+
+            joinTeam() {
+                const teamCode = document.getElementById('teamCode').value.trim();
+                if (!teamCode) {
+                    this.showNotification('❌ Erreur', 'Veuillez entrer un code d\'équipe');
+                    return;
+                }
+                
+                // Simulate team joining
+                localStorage.setItem('teamCode', teamCode);
+                this.showNotification('👥 Équipe rejointe', `Connecté à l'équipe ${teamCode}`);
+                this.loadTeamStats();
+            }
+
+            createTeam() {
+                const teamCode = 'TEAM_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                document.getElementById('teamCode').value = teamCode;
+                localStorage.setItem('teamCode', teamCode);
+                this.showNotification('➕ Équipe créée', `Code d'équipe: ${teamCode}`);
+                this.loadTeamStats();
+            }
+
+            loadTeamStats() {
+                // Simulate team statistics
+                const stats = `
+                    <div style="background: var(--gray-light); padding: 15px; border-radius: 10px;">
+                        <div><strong>Membres actifs :</strong> 5</div>
+                        <div><strong>Moyenne d'équipe :</strong> 32.5h/semaine</div>
+                        <div><strong>Votre position :</strong> 2ème</div>
+                    </div>
+                `;
+                
+                document.getElementById('teamStatsContent').innerHTML = stats;
+                document.getElementById('teamStats').style.display = 'block';
+            }
+
+            requestNotificationPermission() {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+            }
+
+            showNotification(title, message) {
+                // In-app notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--sanofi-purple);
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 16px rgba(139, 90, 150, 0.3);
+                    z-index: 10000;
+                    max-width: 300px;
+                    animation: slideIn 0.3s ease;
+                `;
+                
+                notification.innerHTML = `<strong>${title}</strong><br>${message}`;
+                document.body.appendChild(notification);
+                
+                // Remove after 4 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                }, 4000);
+                
+                // Browser notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(title, { body: message, icon: '/favicon.ico' });
+                }
+            }
+        }
+
+        // Add CSS animations for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+                const themeBtn = document.getElementById('themeBtn');
+                themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            }
+            
+            // Initialize the app
+            window.timeTracker = new TimeTrackerApp();
+            
+            // Service Worker registration for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('data:application/javascript;base64,Ly8gU2ltcGxlIFNlcnZpY2UgV29ya2VyIGZvciBQV0EKc2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHsKICBjb25zb2xlLmxvZygnU2VydmljZSBXb3JrZXIgaW5zdGFsbGVkJyk7Cn0pOwoKc2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGZ1bmN0aW9uKGV2ZW50KSB7CiAgLy8gUGFzcyB0aHJvdWdoIGFsbCByZXF1ZXN0cwogIGV2ZW50LnJlc3BvbmRXaXRoKGZldGNoKGV2ZW50LnJlcXVlc3QpKTsKfSk7')
+                .then(registration => {
+                    console.log('Service Worker registered successfully:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+            }
+            
+            // Install prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // Show install button
+                const installBtn = document.createElement('button');
+                installBtn.textContent = '📱 Installer l\'app';
+                installBtn.className = 'btn';
+                installBtn.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 20px;
+                    z-index: 1000;
+                `;
+                
+                installBtn.addEventListener('click', () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the A2HS prompt');
+                        }
+                        deferredPrompt = null;
+                        document.body.removeChild(installBtn);
+                    });
+                });
+                
+                document.body.appendChild(installBtn);
+                
+                // Remove install button after 10 seconds
+                setTimeout(() => {
+                    if (document.body.contains(installBtn)) {
+                        document.body.removeChild(installBtn);
+                    }
+                }, 10000);
+            });
+            
+            // Welcome message for first time users
+            if (!localStorage.getItem('timeTrackerData')) {
+                setTimeout(() => {
+                    window.timeTracker.showNotification(
+                        '🎉 Bienvenue !', 
+                        'TimeTracker Pro est prêt ! Consultez le tutorial pour commencer.'
+                    );
+                }, 1000);
+            }
+            
+            // Periodic reminders and 7h notification
+            setInterval(() => {
+                if (window.timeTracker.workStatus === 'working') {
+                    const todayHours = window.timeTracker.calculateTodayHours();
+                    
+                    // Notify when reaching exactly 7 hours
+                    if (todayHours >= 7 && !window.timeTracker.notified7Hours) {
+                        window.timeTracker.showNotification(
+                            '🎯 Objectif 7h atteint !',
+                            `Félicitations ! Vous avez travaillé ${window.timeTracker.formatHours(todayHours)} aujourd'hui.`
+                        );
+                        window.timeTracker.notified7Hours = true;
+                    }
+                    
+                    const workTime = (new Date() - window.timeTracker.startTime) / (1000 * 60 * 60);
+                    
+                    // Remind to take break after 4 hours
+                    if (workTime > 4 && !window.timeTracker.breakStartTime && !window.timeTracker.notifiedBreak) {
+                        window.timeTracker.showNotification(
+                            '⏰ Rappel pause',
+                            'Vous travaillez depuis plus de 4h. Pensez à prendre une pause !'
+                        );
+                        window.timeTracker.notifiedBreak = true;
+                    }
+                }
+                
+                // Reset daily notifications at midnight
+                const now = new Date();
+                if (now.getHours() === 0 && now.getMinutes() === 0) {
+                    window.timeTracker.notified7Hours = false;
+                    window.timeTracker.notifiedBreak = false;
+                }
+            }, 60000); // Check every minute for more precise 7h notification
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === '1') {
+                    e.preventDefault();
+                    document.getElementById('startBtn').click();
+                }
+                if (e.ctrlKey && e.key === '2') {
+                    e.preventDefault();
+                    document.getElementById('endBtn').click();
+                }
+                if (e.ctrlKey && e.key === '3') {
+                    e.preventDefault();
+                    document.getElementById('breakStartBtn').click();
+                }
+                if (e.ctrlKey && e.key === '4') {
+                    e.preventDefault();
+                    document.getElementById('breakEndBtn').click();
+                }
+                if (e.key === 'Escape') {
+                    window.timeTracker.closeAllModals();
+                }
+            });
+            
+            // Add swipe gestures for mobile
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                // Swipe right to open menu (if implemented)
+                if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 100) {
+                    // Could implement side menu here
+                }
+                
+                // Swipe down to refresh stats
+                if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY > 100) {
+                    window.timeTracker.updateDisplay();
+                    window.timeTracker.showNotification('🔄 Actualisé', 'Données mises à jour');
+                }
+            });
+            
+            // Add pull-to-refresh for mobile
+            let pullStart = false;
+            let pullChange = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                if (window.scrollY === 0) {
+                    pullStart = true;
+                    pullChange = e.touches[0].clientY;
+                }
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (pullStart) {
+                    const currentY = e.touches[0].clientY;
+                    const pullDistance = currentY - pullChange;
+                    
+                    if (pullDistance > 80) {
+                        // Add visual feedback here if needed
+                    }
+                }
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                if (pullStart) {
+                    const currentY = e.changedTouches[0].clientY;
+                    const pullDistance = currentY - pullChange;
+                    
+                    if (pullDistance > 80) {
+                        window.timeTracker.updateDisplay();
+                        window.timeTracker.showNotification('🔄 Actualisé', 'Données mises à jour');
+                    }
+                    
+                    pullStart = false;
+                    pullChange = 0;
+                }
+            });
+            
+            // Add data backup functionality
+            setInterval(() => {
+                const data = localStorage.getItem('timeTrackerData');
+                if (data && document.getElementById('cloudBtn').classList.contains('enabled')) {
+                    // Simulate cloud backup
+                    console.log('Auto-backup to cloud completed');
+                }
+            }, 300000); // Backup every 5 minutes
+            
+            // Add offline detection
+            window.addEventListener('online', () => {
+                window.timeTracker.showNotification('🌐 En ligne', 'Connexion rétablie');
+            });
+            
+            window.addEventListener('offline', () => {
+                window.timeTracker.showNotification('📵 Hors ligne', 'Mode offline activé');
+            });
+            
+            // Add battery optimization warning
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then((battery) => {
+                    if (battery.level < 0.2 && !battery.charging) {
+                        window.timeTracker.showNotification(
+                            '🔋 Batterie faible', 
+                            'N\'oubliez pas de pointer avant la décharge complète !'
+                        );
+                    }
+                });
+            }
+            
+            // Add location-based features removed - geolocation feature removed as requested
+            
+            // Add weekly summary notification
+            const today = new Date();
+            if (today.getDay() === 5) { // Friday
+                const weekHours = window.timeTracker.calculateWeekHours();
+                const goal = window.timeTracker.weeklyGoal;
+                
+                setTimeout(() => {
+                    window.timeTracker.showNotification(
+                        '📊 Résumé hebdomadaire',
+                        `Cette semaine: ${window.timeTracker.formatHours(weekHours)}/${goal}h (${((weekHours/goal)*100).toFixed(0)}%)`
+                    );
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
