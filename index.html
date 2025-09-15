@@ -434,6 +434,8 @@
             cursor: pointer;
             font-size: 12px;
         }
+
+        @media (max-width: 480px) {
             .container {
                 padding: 10px;
             }
@@ -539,6 +541,10 @@
                     <div class="menu-icon">📊</div>
                     <div class="menu-text">Export Excel</div>
                 </button>
+                <button class="menu-item" id="statsBtn">
+                    <div class="menu-icon">📈</div>
+                    <div class="menu-text">Statistiques</div>
+                </button>
                 <button class="menu-item" id="settingsBtn">
                     <div class="menu-icon">⚙️</div>
                     <div class="menu-text">Paramètres</div>
@@ -546,10 +552,6 @@
                 <button class="menu-item" id="tutorialBtn">
                     <div class="menu-icon">❓</div>
                     <div class="menu-text">Tutorial</div>
-                </button>
-                <button class="menu-item" id="statsBtn">
-                    <div class="menu-icon">📈</div>
-                    <div class="menu-text">Statistiques</div>
                 </button>
             </div>
         </div>
@@ -593,10 +595,6 @@
                 </div>
             </div>
             
-            <div class="form-group" style="display: none;">
-                <label class="form-label">Contraintes (format libre - optionnel) :</label>
-                <textarea class="form-input" id="constraintsInput" rows="2" placeholder="Format libre si besoin..."></textarea>
-            </div>
             <div class="form-group">
                 <label class="form-label">Heures déjà effectuées cette semaine :</label>
                 <input type="number" class="form-input" id="currentWeekHours" placeholder="0" step="0.5" min="0" max="35">
@@ -665,6 +663,34 @@
         </div>
     </div>
 
+    <!-- Statistics Modal -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📈 Vos Statistiques</h2>
+                <button class="close">&times;</button>
+            </div>
+            <div id="personalStats">
+                <div style="background: var(--gray-light); padding: 15px; border-radius: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: var(--sanofi-purple);" id="totalDaysWorked">0</div>
+                            <div style="font-size: 12px;">Jours travaillés</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: var(--sanofi-purple);" id="averageDailyHours">0h00</div>
+                            <div style="font-size: 12px;">Moyenne/jour</div>
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: var(--sanofi-purple); margin-bottom: 10px;">📊 Progression mensuelle</h4>
+                        <div id="monthlyProgress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tutorial Modal -->
     <div id="tutorialModal" class="modal">
         <div class="modal-content">
@@ -686,15 +712,19 @@
             </div>
             <div class="tutorial-step">
                 <h3>4. 🤖 Utiliser le Planning IA</h3>
-                <p>Décrivez vos contraintes (RDV, formations...) et l'IA vous proposera un planning optimal pour atteindre 35h.</p>
+                <p>Ajoutez vos contraintes avec les menus déroulants et l'IA vous proposera un planning optimal pour atteindre 35h.</p>
             </div>
             <div class="tutorial-step">
-                <h3>5. 📊 Consulter vos statistiques</h3>
+                <h3>5. ✏️ Rectifier vos horaires</h3>
+                <p>Paramètres → "Modifier les horaires du jour" pour corriger n'importe quel jour passé ou futur.</p>
+            </div>
+            <div class="tutorial-step">
+                <h3>6. 📊 Consulter vos statistiques</h3>
                 <p>Visualisez vos performances personnelles : jours travaillés, moyenne quotidienne, progression mensuelle.</p>
             </div>
             <div class="tutorial-step">
-                <h3>6. ☁️ Sauvegarde Cloud</h3>
-                <p>Activez la sauvegarde cloud pour sécuriser vos données et les synchroniser entre appareils.</p>
+                <h3>7. ☁️ Sauvegarde Cloud</h3>
+                <p>Activez la sauvegarde cloud pour préparer vos données à l'export vers vos comptes personnels.</p>
             </div>
         </div>
     </div>
@@ -720,7 +750,7 @@
             </div>
             <div class="form-group">
                 <label class="form-label">Rectification d'horaires :</label>
-                <button class="btn btn-secondary" id="editTimesBtn">✏️ Modifier les horaires du jour</button>
+                <button class="btn btn-secondary" id="editTimesBtn">✏️ Modifier les horaires</button>
             </div>
             <button class="btn" id="saveSettingsBtn">💾 Sauvegarder</button>
         </div>
@@ -759,39 +789,20 @@
             </div>
         </div>
     </div>
-    <div id="teamModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">👥 Mode Équipe</h2>
-                <button class="close">&times;</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Code d'équipe :</label>
-                <input type="text" class="form-input" id="teamCode" placeholder="Entrez le code partagé par votre équipe">
-            </div>
-            <button class="btn" id="joinTeamBtn">🤝 Rejoindre l'équipe</button>
-            <div style="text-align: center; margin: 20px 0;">
-                <span>OU</span>
-            </div>
-            <button class="btn btn-secondary" id="createTeamBtn">➕ Créer une nouvelle équipe</button>
-            <div id="teamStats" style="margin-top: 20px; display: none;">
-                <h3 style="color: var(--sanofi-purple);">Statistiques d'équipe :</h3>
-                <div id="teamStatsContent"></div>
-            </div>
-        </div>
-    </div>
 
     <script>
         class TimeTrackerApp {
             constructor() {
-                this.workStatus = 'off'; // 'working', 'break', 'off'
+                this.workStatus = 'off';
                 this.startTime = null;
                 this.endTime = null;
                 this.breakStartTime = null;
                 this.breakEndTime = null;
                 this.dailyHours = 7;
                 this.weeklyGoal = 35;
-                this.constraints = []; // Store structured constraints
+                this.constraints = [];
+                this.notified7Hours = false;
+                this.notifiedBreak = false;
                 
                 this.initializeApp();
                 this.bindEvents();
@@ -800,23 +811,14 @@
             }
 
             initializeApp() {
-                // Load data from localStorage
                 this.loadData();
-                
-                // Initialize display
                 this.updateDisplay();
-                
-                // Check for existing work session
                 this.checkWorkSession();
-                
-                // Start update timer
                 setInterval(() => this.updateDisplay(), 1000);
             }
 
             loadData() {
                 const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
-                
-                // Load today's data
                 const today = new Date().toISOString().split('T')[0];
                 const todayData = data[today] || {};
                 
@@ -825,12 +827,10 @@
                 this.breakStartTime = todayData.breakStartTime ? new Date(todayData.breakStartTime) : null;
                 this.breakEndTime = todayData.breakEndTime ? new Date(todayData.breakEndTime) : null;
                 
-                // Load settings
                 const settings = JSON.parse(localStorage.getItem('timeTrackerSettings') || '{}');
                 this.dailyHours = settings.dailyHours || 7;
                 this.weeklyGoal = settings.weeklyGoal || 35;
                 
-                // Determine work status
                 this.updateWorkStatus();
             }
 
@@ -863,12 +863,10 @@
             }
 
             checkWorkSession() {
-                // Check if user is in middle of work session
                 if (this.startTime && !this.endTime) {
                     const now = new Date();
                     const workHours = (now - this.startTime) / (1000 * 60 * 60);
                     
-                    // Alert if working more than 10 hours
                     if (workHours > 10) {
                         this.showNotification('⚠️ Attention', 'Vous travaillez depuis plus de 10 heures !');
                     }
@@ -876,17 +874,14 @@
             }
 
             bindEvents() {
-                // Punch buttons
                 document.getElementById('startBtn').addEventListener('click', () => this.handleStart());
                 document.getElementById('endBtn').addEventListener('click', () => this.handleEnd());
                 document.getElementById('breakStartBtn').addEventListener('click', () => this.handleBreakStart());
                 document.getElementById('breakEndBtn').addEventListener('click', () => this.handleBreakEnd());
 
-                // Header controls
                 document.getElementById('themeBtn').addEventListener('click', () => this.toggleTheme());
                 document.getElementById('cloudBtn').addEventListener('click', () => this.toggleCloudSync());
 
-                // Menu items
                 document.getElementById('aiPlannerBtn').addEventListener('click', () => this.openModal('aiPlannerModal'));
                 document.getElementById('calendarBtn').addEventListener('click', () => this.openCalendar());
                 document.getElementById('exportBtn').addEventListener('click', () => this.openModal('exportModal'));
@@ -894,23 +889,19 @@
                 document.getElementById('settingsBtn').addEventListener('click', () => this.openModal('settingsModal'));
                 document.getElementById('tutorialBtn').addEventListener('click', () => this.openModal('tutorialModal'));
 
-                // Modal close buttons
                 document.querySelectorAll('.modal .close').forEach(btn => {
                     btn.addEventListener('click', () => this.closeAllModals());
                 });
 
-                // Modal background clicks
                 document.querySelectorAll('.modal').forEach(modal => {
                     modal.addEventListener('click', (e) => {
                         if (e.target === modal) this.closeAllModals();
                     });
                 });
 
-                // AI Planner
                 document.getElementById('generatePlanningBtn').addEventListener('click', () => this.generatePlanning());
                 document.getElementById('addConstraintBtn').addEventListener('click', () => this.addConstraint());
 
-                // Export functionality
                 document.getElementById('exportPeriod').addEventListener('change', (e) => {
                     document.getElementById('customPeriod').style.display = 
                         e.target.value === 'custom' ? 'block' : 'none';
@@ -918,15 +909,12 @@
                 document.getElementById('downloadExcelBtn').addEventListener('click', () => this.downloadExcel());
                 document.getElementById('previewDataBtn').addEventListener('click', () => this.previewData());
 
-                // Settings
                 document.getElementById('saveSettingsBtn').addEventListener('click', () => this.saveSettings());
                 document.getElementById('editTimesBtn').addEventListener('click', () => this.openEditTimes());
 
-                // Calendar navigation
                 document.getElementById('prevMonth').addEventListener('click', () => this.navigateCalendar(-1));
                 document.getElementById('nextMonth').addEventListener('click', () => this.navigateCalendar(1));
 
-                // Edit times functionality
                 document.getElementById('loadDayBtn').addEventListener('click', () => this.loadDayForEdit());
                 document.getElementById('saveEditBtn').addEventListener('click', () => this.saveEditedTimes());
             }
@@ -944,7 +932,6 @@
 
             handleEnd() {
                 if (this.workStatus === 'working' || this.workStatus === 'break') {
-                    // End break if still on break
                     if (this.workStatus === 'break') {
                         this.handleBreakEnd();
                     }
@@ -988,7 +975,6 @@
                 const endTime = this.endTime || new Date();
                 let totalMinutes = (endTime - this.startTime) / (1000 * 60);
                 
-                // Subtract break time
                 if (this.breakStartTime) {
                     const breakEnd = this.breakEndTime || new Date();
                     const breakMinutes = (breakEnd - this.breakStartTime) / (1000 * 60);
@@ -1009,7 +995,7 @@
                 const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
                 const now = new Date();
                 const startOfWeek = new Date(now);
-                startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Monday
+                startOfWeek.setDate(now.getDate() - now.getDay() + 1);
                 startOfWeek.setHours(0, 0, 0, 0);
                 
                 let totalHours = 0;
@@ -1027,7 +1013,6 @@
             }
 
             updateDisplay() {
-                // Update status indicator
                 const statusIndicator = document.getElementById('statusIndicator');
                 const statusText = document.getElementById('statusText');
                 
@@ -1046,16 +1031,9 @@
                         statusText.textContent = 'Hors service';
                 }
 
-                // Update button states
                 this.updateButtonStates();
-
-                // Update times display
                 this.updateTimesDisplay();
-
-                // Update stats
                 this.updateStats();
-
-                // Update progress bar
                 this.updateProgressBar();
             }
 
@@ -1065,7 +1043,6 @@
                 const breakStartBtn = document.getElementById('breakStartBtn');
                 const breakEndBtn = document.getElementById('breakEndBtn');
 
-                // Reset all button states
                 [startBtn, endBtn, breakStartBtn, breakEndBtn].forEach(btn => {
                     btn.classList.remove('active');
                 });
@@ -1127,7 +1104,6 @@
                 this.closeAllModals();
                 document.getElementById(modalId).style.display = 'block';
                 
-                // Load modal-specific data
                 if (modalId === 'settingsModal') {
                     this.loadSettingsModal();
                 }
@@ -1156,7 +1132,6 @@
                 const isEnabled = cloudBtn.classList.contains('enabled');
                 
                 if (!isEnabled) {
-                    // Show explanation about cloud sync
                     const explanation = `
 🌟 SAUVEGARDE CLOUD - COMMENT ÇA MARCHE
 
@@ -1169,11 +1144,6 @@
 • Export automatique vers votre stockage perso
 • Synchronisation entre vos appareils via vos propres comptes
 • Vous gardez le contrôle total de vos données
-
-🔄 SYNCHRONISATION ÉQUIPE :
-• Via codes d'équipe partagés (stockage local)
-• Pas de serveur central = pas d'abonnement
-• Partage direct entre collègues
 
 ✅ ACTIVATION :
 Cette fonction prépare vos données pour l'export automatique vers votre Google Drive, Dropbox, etc.
@@ -1193,6 +1163,7 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 }
             }
 
+            // AI Planning with structured constraints
             addConstraint() {
                 const day = document.getElementById('constraintDay').value;
                 const type = document.getElementById('constraintType').value;
@@ -1215,7 +1186,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 this.constraints.push(constraint);
                 this.updateConstraintsList();
                 
-                // Reset form
                 document.getElementById('constraintDay').value = '';
                 document.getElementById('constraintType').value = '';
                 document.getElementById('constraintTime').value = '';
@@ -1265,7 +1235,8 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 };
                 return labels[type] || type;
             }
-                const constraints = document.getElementById('constraintsInput').value;
+
+            generatePlanning() {
                 const currentHours = parseFloat(document.getElementById('currentWeekHours').value) || 0;
                 const remainingHours = this.weeklyGoal - currentHours;
                 
@@ -1276,106 +1247,103 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                     return;
                 }
                 
-                // Enhanced AI planning with specific scheduling
                 const daysRemaining = this.getRemainingWorkDays();
-                const normalDayHours = 7; // Standard 7h workday
-                
-                // Parse constraints to extract specific requirements
-                const constraintsParsed = this.parseConstraints(constraints);
                 
                 let planning = '<div style="background: var(--gray-light); padding: 15px; border-radius: 10px;">';
                 planning += `<div style="margin-bottom: 10px;"><strong>📊 Analyse :</strong></div>`;
                 planning += `<div>• Heures restantes : ${remainingHours.toFixed(1)}h</div>`;
                 planning += `<div>• Jours restants : ${daysRemaining}</div>`;
+                planning += `<div>• Contraintes actives : ${this.constraints.length}</div>`;
                 planning += '</div>';
                 
                 planning += '<div style="margin-top: 15px;"><strong>📅 Planning détaillé suggéré :</strong></div>';
                 
-                // Generate detailed daily schedules
-                const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+                const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
                 const today = new Date().getDay();
                 let totalPlannedHours = 0;
                 
-                for (let i = 1; i <= 5; i++) { // Monday to Friday
-                    if (i < today) continue; // Skip past days
+                for (let i = 1; i <= 5; i++) {
+                    if (i < today) continue;
                     
                     const dayName = days[i - 1];
-                    const dayConstraint = constraintsParsed.find(c => 
-                        c.day.toLowerCase() === dayName.toLowerCase()
-                    );
+                    const dayConstraints = this.constraints.filter(c => c.day === dayName);
                     
                     let daySchedule = '';
-                    let plannedHours = normalDayHours;
+                    let plannedHours = 7;
                     
-                    if (dayConstraint) {
-                        // Apply constraint
-                        if (dayConstraint.type === 'early_leave') {
-                            const leaveTime = dayConstraint.time;
-                            const startTime = '08:00';
-                            const breakStart = '12:00';
-                            const breakEnd = '13:00';
-                            
-                            plannedHours = this.calculateHoursBetween(startTime, leaveTime) - 1; // -1h break
+                    if (dayConstraints.length > 0) {
+                        const constraint = dayConstraints[0];
+                        
+                        if (constraint.type === 'early_leave') {
+                            plannedHours = this.calculateHoursBetween('08:00', constraint.time) - 1;
                             
                             daySchedule = `
                                 <div style="margin: 5px 0; padding: 10px; background: #fff3cd; border-radius: 5px; border-left: 4px solid orange;">
-                                    <strong>${dayName}</strong> - ${dayConstraint.reason} ⚠️<br>
-                                    🕗 <strong>Arrivée :</strong> ${startTime}<br>
-                                    ⏸️ <strong>Pause :</strong> ${breakStart} - ${breakEnd}<br>
-                                    🕒 <strong>Départ :</strong> ${leaveTime}<br>
+                                    <strong>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</strong> - ${constraint.reason} ⚠️<br>
+                                    🕗 <strong>Arrivée :</strong> 08:00<br>
+                                    ⏸️ <strong>Pause :</strong> 12:00 - 13:00<br>
+                                    🕒 <strong>Départ :</strong> ${constraint.time}<br>
                                     ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
                                 </div>
                             `;
-                        } else if (dayConstraint.type === 'late_arrival') {
-                            const arrivalTime = dayConstraint.time;
-                            const breakStart = '12:00';
-                            const breakEnd = '13:00';
-                            const endTime = '16:00';
-                            
-                            plannedHours = this.calculateHoursBetween(arrivalTime, endTime) - 1;
+                        } else if (constraint.type === 'late_arrival') {
+                            plannedHours = 7;
+                            const endTime = this.addHoursToTime(constraint.time, 8);
                             
                             daySchedule = `
                                 <div style="margin: 5px 0; padding: 10px; background: #fff3cd; border-radius: 5px; border-left: 4px solid orange;">
-                                    <strong>${dayName}</strong> - ${dayConstraint.reason} ⚠️<br>
-                                    🕘 <strong>Arrivée :</strong> ${arrivalTime}<br>
-                                    ⏸️ <strong>Pause :</strong> ${breakStart} - ${breakEnd}<br>
+                                    <strong>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</strong> - ${constraint.reason} ⚠️<br>
+                                    🕘 <strong>Arrivée :</strong> ${constraint.time}<br>
+                                    ⏸️ <strong>Pause :</strong> 12:00 - 13:00<br>
                                     🕕 <strong>Départ :</strong> ${endTime}<br>
                                     ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
                                 </div>
                             `;
-                        } else if (dayConstraint.type === 'long_break') {
-                            const breakStart = '12:00';
-                            const breakEnd = '14:00';
-                            const startTime = '08:00';
-                            const endTime = '17:00';
-                            
-                            plannedHours = this.calculateHoursBetween(startTime, endTime) - 2; // -2h break
+                        } else if (constraint.type === 'long_break') {
+                            plannedHours = 7;
+                            const breakEnd = this.addHoursToTime(constraint.time, 2);
                             
                             daySchedule = `
                                 <div style="margin: 5px 0; padding: 10px; background: #e7f3ff; border-radius: 5px; border-left: 4px solid blue;">
-                                    <strong>${dayName}</strong> - ${dayConstraint.reason} 📚<br>
-                                    🕗 <strong>Arrivée :</strong> ${startTime}<br>
-                                    ⏸️ <strong>Pause longue :</strong> ${breakStart} - ${breakEnd}<br>
-                                    🕔 <strong>Départ :</strong> ${endTime}<br>
+                                    <strong>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</strong> - ${constraint.reason} 📚<br>
+                                    🕗 <strong>Arrivée :</strong> 08:00<br>
+                                    ⏸️ <strong>Pause longue :</strong> ${constraint.time} - ${breakEnd}<br>
+                                    🕔 <strong>Départ :</strong> 17:00<br>
+                                    ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
+                                </div>
+                            `;
+                        } else if (constraint.type === 'short_day') {
+                            plannedHours = Math.min(6, this.calculateHoursBetween('08:00', constraint.time) - 1);
+                            
+                            daySchedule = `
+                                <div style="margin: 5px 0; padding: 10px; background: #ffe6e6; border-radius: 5px; border-left: 4px solid red;">
+                                    <strong>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</strong> - ${constraint.reason} 🔴<br>
+                                    🕗 <strong>Arrivée :</strong> 08:00<br>
+                                    ⏸️ <strong>Pause :</strong> 12:00 - 13:00<br>
+                                    🕒 <strong>Départ :</strong> ${constraint.time}<br>
                                     ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
                                 </div>
                             `;
                         }
                     } else {
-                        // Normal day - calculate to compensate for constraint days
-                        const hoursToCompensate = (remainingHours - totalPlannedHours) / (5 - i + 1);
-                        plannedHours = Math.max(6, Math.min(8, hoursToCompensate));
+                        const constraintHoursLost = this.constraints.reduce((total, c) => {
+                            if (c.type === 'early_leave') return total + (7 - (this.calculateHoursBetween('08:00', c.time) - 1));
+                            if (c.type === 'short_day') return total + (7 - Math.min(6, this.calculateHoursBetween('08:00', c.time) - 1));
+                            return total;
+                        }, 0);
+                        
+                        const normalDaysRemaining = daysRemaining - this.constraints.filter(c => days.includes(c.day)).length;
+                        const hoursToCompensate = (remainingHours + constraintHoursLost) / Math.max(1, normalDaysRemaining);
+                        plannedHours = Math.max(6, Math.min(9, hoursToCompensate));
                         
                         const startTime = plannedHours > 7.5 ? '07:30' : '08:00';
-                        const breakStart = '12:00';
-                        const breakEnd = '13:00';
-                        const endTime = this.addHoursToTime(startTime, plannedHours + 1); // +1 for break
+                        const endTime = this.addHoursToTime(startTime, plannedHours + 1);
                         
                         daySchedule = `
                             <div style="margin: 5px 0; padding: 10px; background: #d1f2eb; border-radius: 5px; border-left: 4px solid green;">
-                                <strong>${dayName}</strong> - Journée normale ✅<br>
+                                <strong>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</strong> - Journée normale ✅<br>
                                 🕗 <strong>Arrivée :</strong> ${startTime}<br>
-                                ⏸️ <strong>Pause :</strong> ${breakStart} - ${breakEnd}<br>
+                                ⏸️ <strong>Pause :</strong> 12:00 - 13:00<br>
                                 🕒 <strong>Départ :</strong> ${endTime}<br>
                                 ⏱️ <strong>Total :</strong> ${plannedHours.toFixed(1)}h
                             </div>
@@ -1397,52 +1365,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 
                 document.getElementById('planningContent').innerHTML = planning;
                 document.getElementById('planningResult').style.display = 'block';
-            }
-
-            parseConstraints(constraintsText) {
-                const constraints = [];
-                const lines = constraintsText.split('\n').filter(line => line.trim());
-                
-                lines.forEach(line => {
-                    line = line.toLowerCase().trim();
-                    
-                    // Parse different constraint types
-                    const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
-                    const dayFound = days.find(day => line.includes(day));
-                    
-                    if (dayFound) {
-                        let constraint = { day: dayFound };
-                        
-                        // Extract reason (after dash)
-                        const reasonMatch = line.match(/-\s*(.+)$/);
-                        constraint.reason = reasonMatch ? reasonMatch[1] : 'Contrainte';
-                        
-                        // Detect constraint type and time
-                        if (line.includes('départ') && line.match(/\d{1,2}h?\d{0,2}/)) {
-                            constraint.type = 'early_leave';
-                            const timeMatch = line.match(/départ\s+(\d{1,2})[h:]?(\d{0,2})/);
-                            if (timeMatch) {
-                                const hour = timeMatch[1].padStart(2, '0');
-                                const minute = (timeMatch[2] || '00').padStart(2, '0');
-                                constraint.time = `${hour}:${minute}`;
-                            }
-                        } else if (line.includes('arrivée') && line.match(/\d{1,2}h?\d{0,2}/)) {
-                            constraint.type = 'late_arrival';
-                            const timeMatch = line.match(/arrivée\s+(\d{1,2})[h:]?(\d{0,2})/);
-                            if (timeMatch) {
-                                const hour = timeMatch[1].padStart(2, '0');
-                                const minute = (timeMatch[2] || '00').padStart(2, '0');
-                                constraint.time = `${hour}:${minute}`;
-                            }
-                        } else if (line.includes('pause longue') || line.includes('formation')) {
-                            constraint.type = 'long_break';
-                        }
-                        
-                        constraints.push(constraint);
-                    }
-                });
-                
-                return constraints;
             }
 
             calculateHoursBetween(startTime, endTime) {
@@ -1469,12 +1391,12 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 const today = new Date();
                 const dayOfWeek = today.getDay();
                 
-                // Count remaining work days this week (Monday = 1, Friday = 5)
-                if (dayOfWeek === 0) return 5; // Sunday
-                if (dayOfWeek === 6) return 5; // Saturday
-                return Math.max(1, 6 - dayOfWeek); // Monday to Friday
+                if (dayOfWeek === 0) return 5;
+                if (dayOfWeek === 6) return 5;
+                return Math.max(1, 6 - dayOfWeek);
             }
 
+            // Calendar functionality
             openCalendar() {
                 this.currentCalendarMonth = new Date();
                 this.renderCalendar();
@@ -1489,7 +1411,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 const grid = document.getElementById('calendarGrid');
                 grid.innerHTML = '';
                 
-                // Add day headers
                 const dayHeaders = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
                 dayHeaders.forEach(day => {
                     const header = document.createElement('div');
@@ -1500,18 +1421,15 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                     grid.appendChild(header);
                 });
                 
-                // Get first day of month and number of days
                 const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
                 const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0);
                 const daysInMonth = lastDay.getDate();
-                const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+                const startingDayOfWeek = (firstDay.getDay() + 6) % 7;
                 
-                // Add empty cells for days before month starts
                 for (let i = 0; i < startingDayOfWeek; i++) {
                     grid.appendChild(document.createElement('div'));
                 }
                 
-                // Add days of month
                 const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
                 
                 for (let day = 1; day <= daysInMonth; day++) {
@@ -1522,7 +1440,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                     const dateStr = new Date(month.getFullYear(), month.getMonth(), day)
                         .toISOString().split('T')[0];
                     
-                    // Check if this day has hours logged
                     if (data[dateStr] && data[dateStr].totalHours > 0) {
                         dayElement.classList.add('has-hours');
                         const hours = document.createElement('div');
@@ -1531,13 +1448,11 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                         dayElement.appendChild(hours);
                     }
                     
-                    // Mark today
                     const today = new Date().toISOString().split('T')[0];
                     if (dateStr === today) {
                         dayElement.classList.add('today');
                     }
                     
-                    // Add click handler
                     dayElement.addEventListener('click', () => this.showDayDetails(dateStr));
                     
                     grid.appendChild(dayElement);
@@ -1580,6 +1495,34 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 detailsDiv.style.display = 'block';
             }
 
+            // Statistics functionality
+            openStats() {
+                this.updatePersonalStats();
+                this.openModal('statsModal');
+            }
+
+            updatePersonalStats() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
+                const dates = Object.keys(data).sort();
+                
+                const daysWorked = dates.filter(date => data[date].totalHours > 0).length;
+                document.getElementById('totalDaysWorked').textContent = daysWorked;
+                
+                const totalHours = dates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
+                const avgHours = daysWorked > 0 ? totalHours / daysWorked : 0;
+                document.getElementById('averageDailyHours').textContent = this.formatHours(avgHours);
+                
+                const currentMonth = new Date().toISOString().substr(0, 7);
+                const monthDates = dates.filter(date => date.startsWith(currentMonth));
+                const monthHours = monthDates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
+                
+                let monthlyHtml = `<div>Ce mois : ${this.formatHours(monthHours)}</div>`;
+                monthlyHtml += `<div>Jours ce mois : ${monthDates.filter(date => data[date].totalHours > 0).length}</div>`;
+                
+                document.getElementById('monthlyProgress').innerHTML = monthlyHtml;
+            }
+
+            // Export functionality
             previewData() {
                 const period = document.getElementById('exportPeriod').value;
                 const data = this.getExportData(period);
@@ -1646,13 +1589,11 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 const period = document.getElementById('exportPeriod').value;
                 const data = this.getExportData(period);
                 
-                // Create CSV content
                 let csvContent = 'Date,Heures Travaillées,Heure Arrivée,Heure Départ\n';
                 data.forEach(row => {
                     csvContent += `${row.date},${row.hours},${row.start},${row.end}\n`;
                 });
                 
-                // Create and download file
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
@@ -1665,6 +1606,7 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 this.showNotification('📊 Export réussi', 'Fichier téléchargé avec succès');
             }
 
+            // Settings functionality
             loadSettingsModal() {
                 document.getElementById('dailyHours').value = this.dailyHours;
                 document.getElementById('weeklyGoal').value = this.weeklyGoal;
@@ -1689,8 +1631,8 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 this.showNotification('⚙️ Paramètres sauvés', 'Configuration mise à jour');
             }
 
+            // Edit times functionality
             openEditTimes() {
-                // Allow editing any date, not just today
                 this.openModal('editTimesModal');
             }
 
@@ -1704,13 +1646,11 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
                 const dayData = data[dateStr] || {};
                 
-                // Reset all fields first
                 document.getElementById('editStartTime').value = '';
                 document.getElementById('editEndTime').value = '';
                 document.getElementById('editBreakStart').value = '';
                 document.getElementById('editBreakEnd').value = '';
                 
-                // Load existing times if available
                 if (dayData.startTime) {
                     const startTime = new Date(dayData.startTime);
                     document.getElementById('editStartTime').value = startTime.toTimeString().substr(0, 5);
@@ -1746,7 +1686,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 
                 const data = JSON.parse(localStorage.getItem('timeTrackerData') || '{}');
                 
-                // Create date objects
                 let dayData = {};
                 
                 if (startTimeStr) {
@@ -1762,13 +1701,11 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                     dayData.breakEndTime = new Date(`${dateStr}T${breakEndStr}:00`).toISOString();
                 }
                 
-                // Calculate hours
                 if (dayData.startTime && dayData.endTime) {
                     const start = new Date(dayData.startTime);
                     const end = new Date(dayData.endTime);
                     let totalMinutes = (end - start) / (1000 * 60);
                     
-                    // Subtract break time
                     if (dayData.breakStartTime && dayData.breakEndTime) {
                         const breakStart = new Date(dayData.breakStartTime);
                         const breakEnd = new Date(dayData.breakEndTime);
@@ -1783,7 +1720,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 data[dateStr] = dayData;
                 localStorage.setItem('timeTrackerData', JSON.stringify(data));
                 
-                // If editing today, update current session
                 const today = new Date().toISOString().split('T')[0];
                 if (dateStr === today) {
                     this.loadData();
@@ -1794,41 +1730,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 this.showNotification('✅ Modifications sauvées', 'Horaires mis à jour avec succès');
             }
 
-            joinTeam() {
-                const teamCode = document.getElementById('teamCode').value.trim();
-                if (!teamCode) {
-                    this.showNotification('❌ Erreur', 'Veuillez entrer un code d\'équipe');
-                    return;
-                }
-                
-                // Simulate team joining
-                localStorage.setItem('teamCode', teamCode);
-                this.showNotification('👥 Équipe rejointe', `Connecté à l'équipe ${teamCode}`);
-                this.loadTeamStats();
-            }
-
-            createTeam() {
-                const teamCode = 'TEAM_' + Math.random().toString(36).substr(2, 6).toUpperCase();
-                document.getElementById('teamCode').value = teamCode;
-                localStorage.setItem('teamCode', teamCode);
-                this.showNotification('➕ Équipe créée', `Code d'équipe: ${teamCode}`);
-                this.loadTeamStats();
-            }
-
-            loadTeamStats() {
-                // Simulate team statistics
-                const stats = `
-                    <div style="background: var(--gray-light); padding: 15px; border-radius: 10px;">
-                        <div><strong>Membres actifs :</strong> 5</div>
-                        <div><strong>Moyenne d'équipe :</strong> 32.5h/semaine</div>
-                        <div><strong>Votre position :</strong> 2ème</div>
-                    </div>
-                `;
-                
-                document.getElementById('teamStatsContent').innerHTML = stats;
-                document.getElementById('teamStats').style.display = 'block';
-            }
-
             requestNotificationPermission() {
                 if ('Notification' in window && Notification.permission === 'default') {
                     Notification.requestPermission();
@@ -1836,7 +1737,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
             }
 
             showNotification(title, message) {
-                // In-app notification
                 const notification = document.createElement('div');
                 notification.style.cssText = `
                     position: fixed;
@@ -1855,20 +1755,18 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 notification.innerHTML = `<strong>${title}</strong><br>${message}`;
                 document.body.appendChild(notification);
                 
-                // Remove after 4 seconds
                 setTimeout(() => {
                     notification.style.animation = 'slideOut 0.3s ease';
                     setTimeout(() => document.body.removeChild(notification), 300);
                 }, 4000);
                 
-                // Browser notification
                 if ('Notification' in window && Notification.permission === 'granted') {
                     new Notification(title, { body: message, icon: '/favicon.ico' });
                 }
             }
         }
 
-        // Add CSS animations for notifications
+        // CSS animations for notifications
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -1897,7 +1795,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
 
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            // Load saved theme
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
                 document.body.setAttribute('data-theme', savedTheme);
@@ -1905,7 +1802,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
             }
             
-            // Initialize the app
             window.timeTracker = new TimeTrackerApp();
             
             // Service Worker registration for PWA
@@ -1925,7 +1821,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 e.preventDefault();
                 deferredPrompt = e;
                 
-                // Show install button
                 const installBtn = document.createElement('button');
                 installBtn.textContent = '📱 Installer l\'app';
                 installBtn.className = 'btn';
@@ -1949,7 +1844,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                 
                 document.body.appendChild(installBtn);
                 
-                // Remove install button after 10 seconds
                 setTimeout(() => {
                     if (document.body.contains(installBtn)) {
                         document.body.removeChild(installBtn);
@@ -1999,7 +1893,7 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                     window.timeTracker.notified7Hours = false;
                     window.timeTracker.notifiedBreak = false;
                 }
-            }, 60000); // Check every minute for more precise 7h notification
+            }, 60000);
             
             // Add keyboard shortcuts
             document.addEventListener('keydown', (e) => {
@@ -2023,103 +1917,6 @@ Cette fonction prépare vos données pour l'export automatique vers votre Google
                     window.timeTracker.closeAllModals();
                 }
             });
-            
-            // Add swipe gestures for mobile
-            let touchStartX = 0;
-            let touchStartY = 0;
-            
-            document.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-            });
-            
-            document.addEventListener('touchend', (e) => {
-                const touchEndX = e.changedTouches[0].clientX;
-                const touchEndY = e.changedTouches[0].clientY;
-                
-                const deltaX = touchEndX - touchStartX;
-                const deltaY = touchEndY - touchStartY;
-                
-                // Swipe right to open menu (if implemented)
-                if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX > 100) {
-                    // Could implement side menu here
-                }
-                
-                // Swipe down to refresh stats
-                if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY > 100) {
-                    window.timeTracker.updateDisplay();
-                    window.timeTracker.showNotification('🔄 Actualisé', 'Données mises à jour');
-                }
-            });
-            
-            // Add pull-to-refresh for mobile
-            let pullStart = false;
-            let pullChange = 0;
-            
-            document.addEventListener('touchstart', (e) => {
-                if (window.scrollY === 0) {
-                    pullStart = true;
-                    pullChange = e.touches[0].clientY;
-                }
-            });
-            
-            document.addEventListener('touchmove', (e) => {
-                if (pullStart) {
-                    const currentY = e.touches[0].clientY;
-                    const pullDistance = currentY - pullChange;
-                    
-                    if (pullDistance > 80) {
-                        // Add visual feedback here if needed
-                    }
-                }
-            });
-            
-            document.addEventListener('touchend', (e) => {
-                if (pullStart) {
-                    const currentY = e.changedTouches[0].clientY;
-                    const pullDistance = currentY - pullChange;
-                    
-                    if (pullDistance > 80) {
-                        window.timeTracker.updateDisplay();
-                        window.timeTracker.showNotification('🔄 Actualisé', 'Données mises à jour');
-                    }
-                    
-                    pullStart = false;
-                    pullChange = 0;
-                }
-            });
-            
-            // Add data backup functionality
-            setInterval(() => {
-                const data = localStorage.getItem('timeTrackerData');
-                if (data && document.getElementById('cloudBtn').classList.contains('enabled')) {
-                    // Simulate cloud backup
-                    console.log('Auto-backup to cloud completed');
-                }
-            }, 300000); // Backup every 5 minutes
-            
-            // Add offline detection
-            window.addEventListener('online', () => {
-                window.timeTracker.showNotification('🌐 En ligne', 'Connexion rétablie');
-            });
-            
-            window.addEventListener('offline', () => {
-                window.timeTracker.showNotification('📵 Hors ligne', 'Mode offline activé');
-            });
-            
-            // Add battery optimization warning
-            if ('getBattery' in navigator) {
-                navigator.getBattery().then((battery) => {
-                    if (battery.level < 0.2 && !battery.charging) {
-                        window.timeTracker.showNotification(
-                            '🔋 Batterie faible', 
-                            'N\'oubliez pas de pointer avant la décharge complète !'
-                        );
-                    }
-                });
-            }
-            
-            // Add location-based features removed - geolocation feature removed as requested
             
             // Add weekly summary notification
             const today = new Date();
