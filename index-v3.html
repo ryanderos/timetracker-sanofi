@@ -1,70 +1,349 @@
-function openSpecialDayModal() {
-            document.getElementById('specialDayModal').style.display = 'block';
-        }
+<button class="btn btn-secondary btn-lg" onclick="openEditTimes()" style="margin-left: 10px;">
+                        <i class="fas fa-edit"></i>
+                        Modifier horaires
+                    </button>
+                </div>
+            </div>
 
-        function openSpecialPeriodModal() {
-            document.getElementById('specialPeriodModal').style.display = 'block';
-        }
-
-        function saveSpecialDay() {
-            const date = document.getElementById('specialDate').value;
-            const type = document.getElementById('specialType').value;
-           
-            if (!date || !type) return;
-           
-            const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-            specialDays[date] = { type,            <!-- Planning Tab -->
-            <div id="planning" class="tab-content">
+            <!-- Support Tab -->
+            <div id="support" class="tab-content">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-brain"></i>
-                            Planning IA
+                            <i class="fas fa-life-ring"></i>
+                            Support & Contact
                         </h3>
                     </div>
                    
                     <div class="form-group">
-                        <label class="form-label">Heures déjà effectuées cette semaine</label>
-                        <input type="number" class="form-control" id="currentWeekHours" placeholder="0" step="0.5" min="0" max="35">
+                        <label class="form-label">Signaler un problème</label>
+                        <textarea class="form-control" id="reportIssue" rows="4" placeholder="Décrivez votre problème ou votre question..."></textarea>
                     </div>
                    
-                    <div class="form-group">
-                        <label class="form-label">Ajouter une contrainte</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <select class="form-control" id="constraintDay">
-                                <option value="">Jour</option>
-                                <option value="lundi">Lundi</option>
-                                <option value="mardi">Mardi</option>
-                                <option value="mercredi">Mercredi</option>
-                                <option value="jeudi">Jeudi</option>
-                                <option value="vendredi">Vendredi</option>
-                            </select>
-                            <select class="form-control" id="constraintType">
-                                <option value="">Type</option>
-                                <option value="early_leave">Départ anticipé</option>
-                                <option value="late_arrival">Arrivée tardive</option>
-                                <option value="long_break">Pause longue</option>
-                            </select>
+                    <button class="btn btn-lg" onclick="sendReport()">
+                        <i class="fas fa-envelope"></i>
+                        Envoyer le rapport
+                    </button>
+                   
+                    <div style="margin-top: 20px; padding: 16px; background: var(--gray-100); border-radius: 12px;">
+                        <h4 style="margin-bottom: 12px; color: var(--text-primary);">Informations de contact</h4>
+                        <p style="margin: 8px 0; color: var(--text-secondary);">
+                            <i class="fas fa-envelope" style="margin-right: 8px;"></i>
+                            <strong>Email :</strong> Ryan.monedero@sanofi.com
+                        </p>
+                        <p style="margin: 8px 0; color: var(--text-secondary);">
+                            <i class="fab fa-linkedin" style="margin-right: 8px;"></i>
+                            <strong>LinkedIn :</strong> 
+                            <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank" style="color: var(--primary);">
+                                Ryan MONEDERO
+                            </a>
+                        </p>
+                        <p style="margin: 8px 0; color: var(--text-secondary);">
+                            <i class="fas fa-code" style="margin-right: 8px;"></i>
+                            <strong>Version :</strong> TimeTracker Pro v2.0.0
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Me soutenir Tab -->
+            <div id="donate" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-heart"></i>
+                            Soutenir le développement
+                        </h3>
+                    </div>
+                   
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 12px; color: var(--text-primary);">Cette app vous fait gagner du temps ?</h4>
+                        <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                            TimeTracker Pro v2 est développé bénévolement pour améliorer votre quotidien professionnel. 
+                            Votre soutien m'aide à maintenir et améliorer l'application.
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-clock" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
+                            <div style="font-weight: 600; margin-bottom: 4px;">Gain de temps</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Pointage automatisé</div>
                         </div>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="time" class="form-control" id="constraintTime" style="flex: 1;">
-                            <input type="text" class="form-control" id="constraintReason" placeholder="Raison" style="flex: 2;">
-                            <button class="btn" onclick="addConstraint()">
-                                <i class="fas fa-plus"></i>
+                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-chart-line" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
+                            <div style="font-weight: 600; margin-bottom: 4px;">Suivi précis</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Statistiques détaillées</div>
+                        </div>
+                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-mobile-alt" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
+                            <div style="font-weight: 600; margin-bottom: 4px;">PWA</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Utilisable hors-ligne</div>
+                        </div>
+                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-shield-alt" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
+                            <div style="font-weight: 600; margin-bottom: 4px;">Sécurisé</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Données locales</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <a href="https://paypal.me/ryanmonedero7" class="btn btn-lg" target="_blank" 
+                           style="background: #0070ba; color: white; border: none; font-weight: 600; margin: 16px 0;">
+                            <i class="fab fa-paypal"></i>
+                            Faire un don PayPal
+                        </a>
+                        
+                        <div style="margin-top: 16px; font-size: 13px; color: var(--text-secondary);">
+                            <p>💝 Montant libre • Paiement sécurisé PayPal</p>
+                            <p>🙏 Merci de votre soutien !</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; padding: 16px; background: var(--gray-100); border-radius: 12px;">
+                        <h5 style="margin-bottom: 12px; color: var(--text-primary);">À quoi servent vos dons ?</h5>
+                        <ul style="color: var(--text-secondary); font-size: 14px; margin-left: 20px;">
+                            <li style="margin-bottom: 4px;">Maintenance et mises à jour de l'application</li>
+                            <li style="margin-bottom: 4px;">Développement de nouvelles fonctionnalités</li>
+                            <li style="margin-bottom: 4px;">Support technique et correction de bugs</li>
+                            <li style="margin-bottom: 4px;">Hébergement et infrastructure</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Tab -->
+            <div id="calendar" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar"></i>
+                            Calendrier
+                        </h3>
+                        <div>
+                            <button class="btn-icon" onclick="navigateCalendar(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span id="currentMonth" style="margin: 0 15px; font-weight: 600;"></span>
+                            <button class="btn-icon" onclick="navigateCalendar(1)">
+                                <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
                     </div>
                    
-                    <div id="constraintsList" style="margin: 20px 0;"></div>
+                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 20px;"></div>
                    
-                    <button class="btn btn-lg" onclick="generatePlanning()">
-                        <i class="fas fa-magic"></i>
-                        Générer le planning
-                    </button>
-                   
-                    <div id="planningResult" style="margin-top: 20px; display: none;"></div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn" onclick="openSpecialDayModal()">
+                            <i class="fas fa-plus"></i>
+                            Ajouter un jour
+                        </button>
+                        <button class="btn btn-secondary" onclick="openSpecialPeriodModal()">
+                            <i class="fas fa-calendar-week"></i>
+                            Ajouter une période
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: var(--gray-100); border-radius: 8px; font-size: 12px;">
+                        <strong>Mode de sélection :</strong> Cliquez sur un jour pour voir les détails, ou utilisez "Ajouter une période" pour les semaines complètes.
+                    </div>
                 </div>
             </div>
+
+            <!-- Statistics Tab -->
+            <div id="statistics" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Statistiques détaillées
+                        </h3>
+                    </div>
+                   
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDaysWorked">0</div>
+                            <div class="stat-label">Jours travaillés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="averageDailyHours">0h00</div>
+                            <div class="stat-label">Moyenne/jour</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="monthlyHours">0h00</div>
+                            <div class="stat-label">Ce mois</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="export" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-download"></i>
+                            Export Excel
+                        </h3>
+                    </div>
+                   
+                    <div class="form-group">
+                        <label class="form-label">Période d'export</label>
+                        <select class="form-control" id="exportPeriod">
+                            <option value="week">Cette semaine</option>
+                            <option value="month">Ce mois</option>
+                            <option value="custom">Période personnalisée</option>
+                        </select>
+                    </div>
+                   
+                    <div id="customPeriod" style="display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label class="form-label">Du</label>
+                                <input type="date" class="form-control" id="exportDateFrom">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Au</label>
+                                <input type="date" class="form-control" id="exportDateTo">
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-lg" onclick="downloadExcel()">
+                            <i class="fas fa-file-excel"></i>
+                            Télécharger Excel
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="previewData()">
+                            <i class="fas fa-eye"></i>
+                            Aperçu
+                        </button>
+                    </div>
+                   
+                    <div id="dataPreview" style="margin-top: 20px; display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); z-index: 1001;">
+        <p>
+            Développé par <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank">Ryan MONEDERO</a>
+            | TimeTracker Pro v2
+        </p>
+    </div>
+
+    <!-- Modals -->
+    <div id="editTimesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Modifier les horaires</h3>
+                <button class="modal-close" onclick="closeModal('editTimesModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="editDate">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Arrivée</label>
+                        <input type="time" class="form-control" id="editStartTime">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Départ</label>
+                        <input type="time" class="form-control" id="editEndTime">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Début pause</label>
+                        <input type="time" class="form-control" id="editBreakStart">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fin pause</label>
+                        <input type="time" class="form-control" id="editBreakEnd">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="saveEditedTimes()">
+                        <i class="fas fa-save"></i>
+                        Sauvegarder
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadDayForEdit()">
+                        <i class="fas fa-upload"></i>
+                        Charger le jour
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="specialDayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Ajouter un jour spécial</h3>
+                <button class="modal-close" onclick="closeModal('specialDayModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="specialDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-control" id="specialType">
+                        <option value="conge">Congé</option>
+                        <option value="maladie">Arrêt maladie</option>
+                        <option value="ecole">Journée école</option>
+                    </select>
+                </div>
+                <button class="btn btn-lg" onclick="saveSpecialDay()">
+                    <i class="fas fa-save"></i>
+                    Sauvegarder
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="specialPeriodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Ajouter une période</h3>
+                <button class="modal-close" onclick="closeModal('specialPeriodModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Date de début</label>
+                    <input type="date" class="form-control" id="periodStartDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date de fin</label>
+                    <input type="date" class="form-control" id="periodEndDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-control" id="periodType">
+                        <option value="ecole">Semaine école</option>
+                        <option value="conge">Congés</option>
+                        <option value="maladie">Arrêt maladie</option>
+                    </select>
+                </div>
+                <button class="btn btn-lg" onclick="saveSpecialPeriod()">
+                    <i class="fas fa-save"></i>
+                    Sauvegarder la période
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         class TimeTrackerV2 {
             constructor() {
@@ -92,17 +371,13 @@ function openSpecialDayModal() {
                 this.updateWelcomeMessage();
                 this.requestNotificationPermission();
                
-                // Update every second
                 setInterval(() => this.updateDisplay(), 1000);
-               
-                // Check for 7h and break notifications every minute
                 setInterval(() => this.checkNotifications(), 60000);
             }
 
             migrateData() {
                 const oldData = localStorage.getItem('timeTrackerData');
                 if (oldData && !localStorage.getItem('timeTrackerV2Data')) {
-                    // Migrate old data to new format
                     const parsed = JSON.parse(oldData);
                     localStorage.setItem('timeTrackerV2Data', JSON.stringify(parsed));
                     console.log('Data migrated to v2');
@@ -180,14 +455,12 @@ function openSpecialDayModal() {
                 const endTime = this.endTime || new Date();
                 let totalMinutes = (endTime - this.startTime) / (1000 * 60);
                
-                // Subtract break time (minimum 45 minutes for lunch)
                 if (this.breakStartTime) {
                     const breakEnd = this.breakEndTime || new Date();
                     const breakMinutes = Math.max(45, (breakEnd - this.breakStartTime) / (1000 * 60));
                     totalMinutes -= breakMinutes;
                 }
                
-                // Subtract 15 min daily break if not skipped
                 const skip15min = document.getElementById('skip15min')?.checked;
                 if (skip15min) {
                     totalMinutes -= 15;
@@ -200,14 +473,12 @@ function openSpecialDayModal() {
                 if (!this.breakStartTime) return 0;
                
                 const breakEnd = this.breakEndTime || new Date();
-                return Math.max(0.75, (breakEnd - this.breakStartTime) / (1000 * 60 * 60)); // Minimum 45min
+                return Math.max(0.75, (breakEnd - this.breakStartTime) / (1000 * 60 * 60));
             }
 
             initializeUI() {
-                // Apply saved theme
                 this.applyTheme();
                
-                // Set current date
                 document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', {
                     weekday: 'long',
                     year: 'numeric',
@@ -215,19 +486,14 @@ function openSpecialDayModal() {
                     day: 'numeric'
                 });
                
-                // Initialize calendar
                 this.renderCalendar();
-               
-                // Show install button if PWA is available
                 this.checkPWAInstall();
             }
 
             bindEvents() {
-                // Menu toggle
                 document.getElementById('menuToggle').addEventListener('click', () => this.toggleSidebar());
                 document.getElementById('sidebarOverlay').addEventListener('click', () => this.closeSidebar());
                
-                // Navigation
                 document.querySelectorAll('[data-tab]').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const tab = e.target.dataset.tab || e.target.closest('[data-tab]').dataset.tab;
@@ -235,28 +501,23 @@ function openSpecialDayModal() {
                     });
                 });
                
-                // Punch buttons
                 document.getElementById('startBtn').addEventListener('click', () => this.handleStart());
                 document.getElementById('endBtn').addEventListener('click', () => this.handleEnd());
                 document.getElementById('breakStartBtn').addEventListener('click', () => this.handleBreakStart());
                 document.getElementById('breakEndBtn').addEventListener('click', () => this.handleBreakEnd());
                
-                // 15 min break checkbox
                 document.getElementById('skip15min').addEventListener('change', () => {
                     this.saveData();
                     this.updateDisplay();
                 });
                
-                // Theme toggle
                 document.getElementById('themeToggle').addEventListener('click', () => this.showThemeSelector());
                
-                // Export period change
                 document.getElementById('exportPeriod').addEventListener('change', (e) => {
                     document.getElementById('customPeriod').style.display =
                         e.target.value === 'custom' ? 'block' : 'none';
                 });
                
-                // Profile photo
                 document.getElementById('profilePhoto').addEventListener('change', (e) => this.handleProfilePhoto(e));
             }
 
@@ -274,21 +535,16 @@ function openSpecialDayModal() {
             }
 
             switchTab(tabName) {
-                // Update nav items
                 document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
                 document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
                
-                // Update tab content
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                 document.getElementById(tabName).classList.add('active');
                
-                // Close sidebar on mobile
                 this.closeSidebar();
                
-                // Update specific tabs
                 if (tabName === 'statistics') this.updateStatistics();
                 if (tabName === 'calendar') this.renderCalendar();
-            }
             }
 
             handleStart() {
@@ -389,13 +645,11 @@ function openSpecialDayModal() {
                     breakEnd: document.getElementById('breakEndBtn')
                 };
                
-                // Reset all buttons
                 Object.values(buttons).forEach(btn => {
                     btn.classList.remove('active');
                     btn.classList.remove('primary');
                 });
                
-                // Set active states
                 switch (this.workStatus) {
                     case 'working':
                         buttons.start.classList.add('active');
@@ -459,7 +713,6 @@ function openSpecialDayModal() {
                         totalHours += data[dateStr].totalHours || 0;
                     }
                    
-                    // Add special days (congé/maladie/école = 7h)
                     const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
                     if (specialDays[dateStr]) {
                         totalHours += 7;
@@ -521,14 +774,12 @@ function openSpecialDayModal() {
                 if (this.workStatus === 'working') {
                     const todayHours = this.calculateTodayHours();
                    
-                    // 7h notification
                     if (todayHours >= 7 && !this.notified7Hours) {
                         this.showNotification('🎯 Objectif atteint !',
                             `Vous avez travaillé ${this.formatHours(todayHours)} aujourd'hui`);
                         this.notified7Hours = true;
                     }
                    
-                    // Break reminder after 4h
                     const workTime = (new Date() - this.startTime) / (1000 * 60 * 60);
                     if (workTime > 4 && !this.breakStartTime && !this.notifiedBreak) {
                         this.showNotification('Pause recommandée',
@@ -537,7 +788,6 @@ function openSpecialDayModal() {
                     }
                 }
                
-                // Reset notifications at midnight
                 const now = new Date();
                 if (now.getHours() === 0 && now.getMinutes() === 0) {
                     this.notified7Hours = false;
@@ -546,9 +796,6 @@ function openSpecialDayModal() {
             }
 
             applyTheme() {
-                const root = document.documentElement;
-               
-                // Apply color theme
                 switch (this.settings.theme) {
                     case 'blue':
                         document.body.setAttribute('data-theme', 'blue');
@@ -560,12 +807,10 @@ function openSpecialDayModal() {
                         document.body.removeAttribute('data-theme');
                 }
                
-                // Apply dark mode
                 if (this.settings.darkMode) {
                     document.body.setAttribute('data-theme', 'dark');
                 }
                
-                // Update form values
                 if (document.getElementById('colorTheme')) {
                     document.getElementById('colorTheme').value = this.settings.theme;
                     document.getElementById('darkMode').checked = this.settings.darkMode;
@@ -614,7 +859,6 @@ function openSpecialDayModal() {
                 const grid = document.getElementById('calendarGrid');
                 grid.innerHTML = '';
                
-                // Add day headers
                 const dayHeaders = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
                 dayHeaders.forEach(day => {
                     const header = document.createElement('div');
@@ -631,7 +875,6 @@ function openSpecialDayModal() {
                 const daysInMonth = lastDay.getDate();
                 const startingDayOfWeek = (firstDay.getDay() + 6) % 7;
                
-                // Add empty cells
                 for (let i = 0; i < startingDayOfWeek; i++) {
                     grid.appendChild(document.createElement('div'));
                 }
@@ -653,14 +896,12 @@ function openSpecialDayModal() {
                    
                     dayElement.textContent = day;
                    
-                    // Today
                     const today = new Date().toISOString().split('T')[0];
                     if (dateStr === today) {
                         dayElement.style.background = 'var(--primary)';
                         dayElement.style.color = 'white';
                     }
                    
-                    // Has hours
                     if (data[dateStr] && data[dateStr].totalHours > 0) {
                         dayElement.style.borderColor = 'var(--success)';
                         dayElement.style.background = 'var(--success)';
@@ -672,7 +913,6 @@ function openSpecialDayModal() {
                         dayElement.appendChild(hours);
                     }
                    
-                    // Special days
                     if (specialDays[dateStr]) {
                         dayElement.style.borderColor = 'var(--warning)';
                         dayElement.style.background = 'var(--warning)';
@@ -770,7 +1010,6 @@ function openSpecialDayModal() {
             window.timeTracker.updateWelcomeMessage();
             window.timeTracker.showNotification('Profil sauvegardé', 'Vos informations ont été mises à jour');
            
-            // Update form fields
             document.getElementById('userFirstName').value = profile.firstName;
             document.getElementById('userLastName').value = profile.lastName;
             document.getElementById('userStatus').value = profile.status;
@@ -846,7 +1085,6 @@ function openSpecialDayModal() {
             const start = new Date(startDate);
             const end = new Date(endDate);
            
-            // Add each day in the period
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                 const dateStr = d.toISOString().split('T')[0];
                 specialDays[dateStr] = { type, date: new Date().toISOString() };
@@ -859,13 +1097,6 @@ function openSpecialDayModal() {
             
             const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
             window.timeTracker.showNotification('Période ajoutée', `${days} jours de ${type} ajoutés`);
-        } date: new Date().toISOString() };
-           
-            localStorage.setItem('timeTrackerV2SpecialDays', JSON.stringify(specialDays));
-           
-            closeModal('specialDayModal');
-            window.timeTracker.renderCalendar();
-            window.timeTracker.showNotification('Jour spécial ajouté', `${type} enregistré pour le ${new Date(date).toLocaleDateString('fr-FR')}`);
         }
 
         function openEditTimes() {
@@ -907,7 +1138,6 @@ function openSpecialDayModal() {
                 breakEndTime: breakEnd ? new Date(`${dateStr}T${breakEnd}`).toISOString() : null
             };
            
-            // Calculate hours
             if (dayData.startTime && dayData.endTime) {
                 let totalMinutes = (new Date(dayData.endTime) - new Date(dayData.startTime)) / (1000 * 60);
                
@@ -917,9 +1147,7 @@ function openSpecialDayModal() {
                     dayData.breakHours = breakMinutes / 60;
                 }
                
-                // 15 min break
                 totalMinutes -= 15;
-               
                 dayData.totalHours = Math.max(0, totalMinutes / 60);
             }
            
@@ -1049,7 +1277,6 @@ function openSpecialDayModal() {
         document.addEventListener('DOMContentLoaded', () => {
             window.timeTracker = new TimeTrackerV2();
            
-            // Load profile form
             const profile = window.timeTracker.userProfile;
             if (document.getElementById('userFirstName')) {
                 document.getElementById('userFirstName').value = profile.firstName || '';
@@ -1057,7 +1284,6 @@ function openSpecialDayModal() {
                 document.getElementById('userStatus').value = profile.status || 'alternant';
             }
            
-            // Close modals when clicking outside
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
@@ -1289,7 +1515,7 @@ function openSpecialDayModal() {
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding-bottom: 60px; /* Space for footer */
+            padding-bottom: 60px;
         }
 
         .tab-content {
@@ -1444,19 +1670,15 @@ function openSpecialDayModal() {
         }
 
         /* Status indicator */
-        .status-card {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
         .status-indicator {
             display: inline-flex;
             align-items: center;
             gap: 12px;
             background: var(--bg-secondary);
-            padding: 16px 24px;
+            padding: 8px 16px;
             border-radius: 50px;
             font-weight: 500;
+            font-size: 14px;
         }
 
         .status-dot {
@@ -1633,53 +1855,6 @@ function openSpecialDayModal() {
             text-decoration: underline;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 12px;
-            }
-           
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-           
-            .card {
-                padding: 16px;
-            }
-        }
-
-        /* Animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            z-index: 10000;
-            max-width: 320px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-
         /* Modal */
         .modal {
             display: none;
@@ -1729,7 +1904,7 @@ function openSpecialDayModal() {
             padding: 24px;
         }
 
-        /* Special break checkbox */
+        /* Break checkbox */
         .break-option {
             background: var(--gray-100);
             padding: 16px;
@@ -1747,35 +1922,50 @@ function openSpecialDayModal() {
             margin-top: 4px;
         }
 
-        /* Donation specific styles */
-        .donation-card {
-            background: linear-gradient(135deg, var(--warning), #E67E22);
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--primary);
             color: white;
-            text-align: center;
-        }
-
-        .donation-card .card-title {
-            color: white;
-        }
-
-        .donation-features {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 20px 0;
-        }
-
-        .donation-feature {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 16px;
+            padding: 16px 20px;
             border-radius: 12px;
-            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 10000;
+            max-width: 320px;
+            animation: slideIn 0.3s ease;
         }
 
-        .donation-feature i {
-            font-size: 24px;
-            margin-bottom: 8px;
-            display: block;
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 12px;
+            }
+           
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+           
+            .card {
+                padding: 16px;
+            }
         }
     </style>
 </head>
@@ -1807,7 +1997,6 @@ function openSpecialDayModal() {
                 <i class="fas fa-home"></i>
                 Accueil
             </button>
-
             <button class="nav-item" data-tab="calendar">
                 <i class="fas fa-calendar"></i>
                 Calendrier
@@ -2045,350 +2234,4 @@ function openSpecialDayModal() {
                         Sauvegarder
                     </button>
                    
-                    <button class="btn btn-secondary btn-lg" onclick="openEditTimes()" style="margin-left: 10px;">
-                        <i class="fas fa-edit"></i>
-                        Modifier horaires
-                    </button>
-                </div>
-            </div>
-
-            <!-- Support Tab - NETTOYÉ SANS PAYPAL -->
-            <div id="support" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-life-ring"></i>
-                            Support & Contact
-                        </h3>
-                    </div>
-                   
-                    <div class="form-group">
-                        <label class="form-label">Signaler un problème</label>
-                        <textarea class="form-control" id="reportIssue" rows="4" placeholder="Décrivez votre problème ou votre question..."></textarea>
-                    </div>
-                   
-                    <button class="btn btn-lg" onclick="sendReport()">
-                        <i class="fas fa-envelope"></i>
-                        Envoyer le rapport
-                    </button>
-                   
-                    <div style="margin-top: 20px; padding: 16px; background: var(--gray-100); border-radius: 12px;">
-                        <h4 style="margin-bottom: 12px; color: var(--text-primary);">Informations de contact</h4>
-                        <p style="margin: 8px 0; color: var(--text-secondary);">
-                            <i class="fas fa-envelope" style="margin-right: 8px;"></i>
-                            <strong>Email :</strong> Ryan.monedero@sanofi.com
-                        </p>
-                        <p style="margin: 8px 0; color: var(--text-secondary);">
-                            <i class="fab fa-linkedin" style="margin-right: 8px;"></i>
-                            <strong>LinkedIn :</strong> 
-                            <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank" style="color: var(--primary);">
-                                Ryan MONEDERO
-                            </a>
-                        </p>
-                        <p style="margin: 8px 0; color: var(--text-secondary);">
-                            <i class="fas fa-code" style="margin-right: 8px;"></i>
-                            <strong>Version :</strong> TimeTracker Pro v2.0.0
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Me soutenir Tab - STYLE STANDARD -->
-            <div id="donate" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-heart"></i>
-                            Soutenir le développement
-                        </h3>
-                    </div>
-                   
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <h4 style="margin-bottom: 12px; color: var(--text-primary);">Cette app vous fait gagner du temps ?</h4>
-                        <p style="margin-bottom: 16px; color: var(--text-secondary);">
-                            TimeTracker Pro v2 est développé bénévolement pour améliorer votre quotidien professionnel. 
-                            Votre soutien m'aide à maintenir et améliorer l'application.
-                        </p>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                            <i class="fas fa-clock" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-                            <div style="font-weight: 600; margin-bottom: 4px;">Gain de temps</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Pointage automatisé</div>
-                        </div>
-                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                            <i class="fas fa-chart-line" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-                            <div style="font-weight: 600; margin-bottom: 4px;">Suivi précis</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Statistiques détaillées</div>
-                        </div>
-                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                            <i class="fas fa-mobile-alt" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-                            <div style="font-weight: 600; margin-bottom: 4px;">PWA</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Utilisable hors-ligne</div>
-                        </div>
-                        <div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-                            <i class="fas fa-shield-alt" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-                            <div style="font-weight: 600; margin-bottom: 4px;">Sécurisé</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">Données locales</div>
-                        </div>
-                    </div>
-
-                    <div style="text-align: center;">
-                        <a href="https://paypal.me/ryanmonedero7" class="btn btn-lg" target="_blank" 
-                           style="background: #0070ba; color: white; border: none; font-weight: 600; margin: 16px 0;">
-                            <i class="fab fa-paypal"></i>
-                            Faire un don PayPal
-                        </a>
-                        
-                        <div style="margin-top: 16px; font-size: 13px; color: var(--text-secondary);">
-                            <p>💝 Montant libre • Paiement sécurisé PayPal</p>
-                            <p>🙏 Merci de votre soutien !</p>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 24px; padding: 16px; background: var(--gray-100); border-radius: 12px;">
-                        <h5 style="margin-bottom: 12px; color: var(--text-primary);">À quoi servent vos dons ?</h5>
-                        <ul style="color: var(--text-secondary); font-size: 14px; margin-left: 20px;">
-                            <li style="margin-bottom: 4px;">Maintenance et mises à jour de l'application</li>
-                            <li style="margin-bottom: 4px;">Développement de nouvelles fonctionnalités</li>
-                            <li style="margin-bottom: 4px;">Support technique et correction de bugs</li>
-                            <li style="margin-bottom: 4px;">Hébergement et infrastructure</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Calendar Tab with Period Selection -->
-            <div id="calendar" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-calendar"></i>
-                            Calendrier
-                        </h3>
-                        <div>
-                            <button class="btn-icon" onclick="navigateCalendar(-1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <span id="currentMonth" style="margin: 0 15px; font-weight: 600;"></span>
-                            <button class="btn-icon" onclick="navigateCalendar(1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                   
-                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 20px;"></div>
-                   
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button class="btn" onclick="openSpecialDayModal()">
-                            <i class="fas fa-plus"></i>
-                            Ajouter un jour
-                        </button>
-                        <button class="btn btn-secondary" onclick="openSpecialPeriodModal()">
-                            <i class="fas fa-calendar-week"></i>
-                            Ajouter une période
-                        </button>
-                    </div>
-
-                    <div style="margin-top: 16px; padding: 12px; background: var(--gray-100); border-radius: 8px; font-size: 12px;">
-                        <strong>Mode de sélection :</strong> Cliquez et faites glisser pour sélectionner plusieurs jours, ou utilisez "Ajouter une période" pour les semaines complètes.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistics Tab -->
-            <div id="statistics" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-bar"></i>
-                            Statistiques détaillées
-                        </h3>
-                    </div>
-                   
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalDaysWorked">0</div>
-                            <div class="stat-label">Jours travaillés</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="averageDailyHours">0h00</div>
-                            <div class="stat-label">Moyenne/jour</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="monthlyHours">0h00</div>
-                            <div class="stat-label">Ce mois</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Export Tab -->
-            <div id="export" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-download"></i>
-                            Export Excel
-                        </h3>
-                    </div>
-                   
-                    <div class="form-group">
-                        <label class="form-label">Période d'export</label>
-                        <select class="form-control" id="exportPeriod">
-                            <option value="week">Cette semaine</option>
-                            <option value="month">Ce mois</option>
-                            <option value="custom">Période personnalisée</option>
-                        </select>
-                    </div>
-                   
-                    <div id="customPeriod" style="display: none;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label class="form-label">Du</label>
-                                <input type="date" class="form-control" id="exportDateFrom">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Au</label>
-                                <input type="date" class="form-control" id="exportDateTo">
-                            </div>
-                        </div>
-                    </div>
-                   
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-lg" onclick="downloadExcel()">
-                            <i class="fas fa-file-excel"></i>
-                            Télécharger Excel
-                        </button>
-                        <button class="btn btn-secondary btn-lg" onclick="previewData()">
-                            <i class="fas fa-eye"></i>
-                            Aperçu
-                        </button>
-                    </div>
-                   
-                    <div id="dataPreview" style="margin-top: 20px; display: none;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer inside navbar for better positioning -->
-    </main>
-
-    <!-- Footer moved to navbar level -->
-    <div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); z-index: 1001;">
-        <p>
-            Développé par <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank">Ryan MONEDERO</a>
-            | TimeTracker Pro v2
-        </p>
-    </div>
-
-    <!-- Modals -->
-    <div id="editTimesModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Modifier les horaires</h3>
-                <button class="modal-close" onclick="closeModal('editTimesModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="date" class="form-control" id="editDate">
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label class="form-label">Arrivée</label>
-                        <input type="time" class="form-control" id="editStartTime">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Départ</label>
-                        <input type="time" class="form-control" id="editEndTime">
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label class="form-label">Début pause</label>
-                        <input type="time" class="form-control" id="editBreakStart">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fin pause</label>
-                        <input type="time" class="form-control" id="editBreakEnd">
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn" onclick="saveEditedTimes()">
-                        <i class="fas fa-save"></i>
-                        Sauvegarder
-                    </button>
-                    <button class="btn btn-secondary" onclick="loadDayForEdit()">
-                        <i class="fas fa-upload"></i>
-                        Charger le jour
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="specialDayModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Ajouter un jour spécial</h3>
-                <button class="modal-close" onclick="closeModal('specialDayModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="date" class="form-control" id="specialDate">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Type</label>
-                    <select class="form-control" id="specialType">
-                        <option value="conge">Congé</option>
-                        <option value="maladie">Arrêt maladie</option>
-                        <option value="ecole">Journée école</option>
-                    </select>
-                </div>
-                <button class="btn btn-lg" onclick="saveSpecialDay()">
-                    <i class="fas fa-save"></i>
-                    Sauvegarder
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="specialPeriodModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Ajouter une période</h3>
-                <button class="modal-close" onclick="closeModal('specialPeriodModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Date de début</label>
-                    <input type="date" class="form-control" id="periodStartDate">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date de fin</label>
-                    <input type="date" class="form-control" id="periodEndDate">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Type</label>
-                    <select class="form-control" id="periodType">
-                        <option value="ecole">Semaine école</option>
-                        <option value="conge">Congés</option>
-                        <option value="maladie">Arrêt maladie</option>
-                    </select>
-                </div>
-                <button class="btn btn-lg" onclick="saveSpecialPeriod()">
-                    <i class="fas fa-save"></i>
-                    Sauvegarder la période
-                </button>
-            </div>
-        </div>
-    </div>
+                    <button class="btn btn-secondary btn-lg" onclick="openEditTimes()" style="
