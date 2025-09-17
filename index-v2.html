@@ -185,15 +185,16 @@
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="app-footer">
-            <p>
-                Développé par <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank">Ryan MONEDERO</a> 
-                | TimeTracker Pro v2 
-                | <a href="mailto:Ryan.monedero@sanofi.com">Support</a>
-            </p>
-        </footer>
+        <!-- Footer inside navbar for better positioning -->
     </main>
+
+    <!-- Footer moved to navbar level -->
+    <div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); z-index: 1001;">
+        <p>
+            Développé par <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank">Ryan MONEDERO</a> 
+            | TimeTracker Pro v2
+        </p>
+    </div>
 
     <!-- Modals -->
     <div id="editTimesModal" class="modal">
@@ -1554,11 +1555,14 @@
             margin-top: 60px;
             padding: 20px;
             min-height: calc(100vh - 60px);
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
+            padding-bottom: 60px; /* Space for footer */
         }
 
         .tab-content {
@@ -1887,11 +1891,10 @@
         /* Footer */
         .app-footer {
             text-align: center;
-            padding: 24px;
+            padding: 12px 24px;
             color: var(--text-secondary);
-            font-size: 12px;
+            font-size: 11px;
             border-top: 1px solid var(--border-color);
-            margin-top: 40px;
         }
 
         .app-footer a {
@@ -2073,6 +2076,10 @@
             <button class="nav-item" data-tab="support">
                 <i class="fas fa-life-ring"></i>
                 Support
+            </button>
+            <button class="nav-item" data-tab="donate">
+                <i class="fas fa-heart"></i>
+                Me soutenir
             </button>
         </nav>
     </aside>
