@@ -1,279 +1,4 @@
-<div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-life-ring"></i>
-                            Support & Contact
-                        </h3>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Signaler un problème</label>
-                        <textarea class="form-control" id="reportIssue" rows="4" placeholder="Décrivez votre problème ou votre question..."></textarea>
-                    </div>
-                    
-                    <button class="btn btn-lg" onclick="sendReport()">
-                        <i class="fas fa-envelope"></i>
-                        Envoyer
-                    </button>
-                    
-                    <div style="margin: 30px 0; padding: 20px; background: var(--gray-100); border-radius: 12px;">
-                        <h4 style="margin-bottom: 10px;">Me soutenir</h4>
-                        <p style="margin-bottom: 15px; color: var(--text-secondary);">
-                            Cette application vous fait gagner du temps ? Vous pouvez soutenir son développement.
-                        </p>
-                        <a href="https://paypal.me/ryanmonedero7" class="btn btn-warning" target="_blank">
-                            <i class="fab fa-paypal"></i>
-                            Faire un don PayPal
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Planning Tab -->
-            <div id="planning" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-brain"></i>
-                            Planning IA
-                        </h3>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Heures déjà effectuées cette semaine</label>
-                        <input type="number" class="form-control" id="currentWeekHours" placeholder="0" step="0.5" min="0" max="35">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Ajouter une contrainte</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <select class="form-control" id="constraintDay">
-                                <option value="">Jour</option>
-                                <option value="lundi">Lundi</option>
-                                <option value="mardi">Mardi</option>
-                                <option value="mercredi">Mercredi</option>
-                                <option value="jeudi">Jeudi</option>
-                                <option value="vendredi">Vendredi</option>
-                            </select>
-                            <select class="form-control" id="constraintType">
-                                <option value="">Type</option>
-                                <option value="early_leave">Départ anticipé</option>
-                                <option value="late_arrival">Arrivée tardive</option>
-                                <option value="long_break">Pause longue</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="time" class="form-control" id="constraintTime" style="flex: 1;">
-                            <input type="text" class="form-control" id="constraintReason" placeholder="Raison" style="flex: 2;">
-                            <button class="btn" onclick="addConstraint()">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="constraintsList" style="margin: 20px 0;"></div>
-                    
-                    <button class="btn btn-lg" onclick="generatePlanning()">
-                        <i class="fas fa-magic"></i>
-                        Générer le planning
-                    </button>
-                    
-                    <div id="planningResult" style="margin-top: 20px; display: none;"></div>
-                </div>
-            </div>
-
-            <!-- Calendar Tab -->
-            <div id="calendar" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-calendar"></i>
-                            Calendrier
-                        </h3>
-                        <div>
-                            <button class="btn-icon" onclick="navigateCalendar(-1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <span id="currentMonth" style="margin: 0 15px; font-weight: 600;"></span>
-                            <button class="btn-icon" onclick="navigateCalendar(1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 20px;"></div>
-                    
-                    <button class="btn" onclick="openSpecialDayModal()">
-                        <i class="fas fa-plus"></i>
-                        Ajouter congé/maladie/école
-                    </button>
-                </div>
-            </div>
-
-            <!-- Statistics Tab -->
-            <div id="statistics" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chart-bar"></i>
-                            Statistiques détaillées
-                        </h3>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalDaysWorked">0</div>
-                            <div class="stat-label">Jours travaillés</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="averageDailyHours">0h00</div>
-                            <div class="stat-label">Moyenne/jour</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="monthlyHours">0h00</div>
-                            <div class="stat-label">Ce mois</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Export Tab -->
-            <div id="export" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-download"></i>
-                            Export Excel
-                        </h3>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Période d'export</label>
-                        <select class="form-control" id="exportPeriod">
-                            <option value="week">Cette semaine</option>
-                            <option value="month">Ce mois</option>
-                            <option value="custom">Période personnalisée</option>
-                        </select>
-                    </div>
-                    
-                    <div id="customPeriod" style="display: none;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label class="form-label">Du</label>
-                                <input type="date" class="form-control" id="exportDateFrom">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Au</label>
-                                <input type="date" class="form-control" id="exportDateTo">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-lg" onclick="downloadExcel()">
-                            <i class="fas fa-file-excel"></i>
-                            Télécharger Excel
-                        </button>
-                        <button class="btn btn-secondary btn-lg" onclick="previewData()">
-                            <i class="fas fa-eye"></i>
-                            Aperçu
-                        </button>
-                    </div>
-                    
-                    <div id="dataPreview" style="margin-top: 20px; display: none;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer inside navbar for better positioning -->
-    </main>
-
-    <!-- Footer moved to navbar level -->
-    <div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); z-index: 1001;">
-        <p>
-            Développé par <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank">Ryan MONEDERO</a> 
-            | TimeTracker Pro v2
-        </p>
-    </div>
-
-    <!-- Modals -->
-    <div id="editTimesModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Modifier les horaires</h3>
-                <button class="modal-close" onclick="closeModal('editTimesModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="date" class="form-control" id="editDate">
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label class="form-label">Arrivée</label>
-                        <input type="time" class="form-control" id="editStartTime">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Départ</label>
-                        <input type="time" class="form-control" id="editEndTime">
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label class="form-label">Début pause</label>
-                        <input type="time" class="form-control" id="editBreakStart">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fin pause</label>
-                        <input type="time" class="form-control" id="editBreakEnd">
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn" onclick="saveEditedTimes()">
-                        <i class="fas fa-save"></i>
-                        Sauvegarder
-                    </button>
-                    <button class="btn btn-secondary" onclick="loadDayForEdit()">
-                        <i class="fas fa-upload"></i>
-                        Charger le jour
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="specialDayModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Ajouter un jour spécial</h3>
-                <button class="modal-close" onclick="closeModal('specialDayModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="date" class="form-control" id="specialDate">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Type</label>
-                    <select class="form-control" id="specialType">
-                        <option value="conge">Congé</option>
-                        <option value="maladie">Arrêt maladie</option>
-                        <option value="ecole">Journée école</option>
-                    </select>
-                </div>
-                <button class="btn btn-lg" onclick="saveSpecialDay()">
-                    <i class="fas fa-save"></i>
-                    Sauvegarder
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
         class TimeTrackerV2 {
             constructor() {
                 this.version = '2.0.0';
@@ -288,7 +13,7 @@
                 this.currentCalendarMonth = new Date();
                 this.userProfile = this.loadUserProfile();
                 this.settings = this.loadSettings();
-                
+               
                 this.initializeApp();
             }
 
@@ -300,10 +25,10 @@
                 this.updateDisplay();
                 this.updateWelcomeMessage();
                 this.requestNotificationPermission();
-                
+               
                 // Update every second
                 setInterval(() => this.updateDisplay(), 1000);
-                
+               
                 // Check for 7h and break notifications every minute
                 setInterval(() => this.checkNotifications(), 60000);
             }
@@ -342,22 +67,22 @@
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
                 const today = new Date().toISOString().split('T')[0];
                 const todayData = data[today] || {};
-                
+               
                 this.startTime = todayData.startTime ? new Date(todayData.startTime) : null;
                 this.endTime = todayData.endTime ? new Date(todayData.endTime) : null;
                 this.breakStartTime = todayData.breakStartTime ? new Date(todayData.breakStartTime) : null;
                 this.breakEndTime = todayData.breakEndTime ? new Date(todayData.breakEndTime) : null;
-                
+               
                 this.dailyHours = this.settings.dailyHours;
                 this.weeklyGoal = this.settings.weeklyGoal;
-                
+               
                 this.updateWorkStatus();
             }
 
             saveData() {
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
                 const today = new Date().toISOString().split('T')[0];
-                
+               
                 data[today] = {
                     startTime: this.startTime?.toISOString(),
                     endTime: this.endTime?.toISOString(),
@@ -367,7 +92,7 @@
                     breakHours: this.calculateBreakHours(),
                     skip15min: document.getElementById('skip15min')?.checked || false
                 };
-                
+               
                 localStorage.setItem('timeTrackerV2Data', JSON.stringify(data));
             }
 
@@ -385,29 +110,29 @@
 
             calculateTodayHours() {
                 if (!this.startTime) return 0;
-                
+               
                 const endTime = this.endTime || new Date();
                 let totalMinutes = (endTime - this.startTime) / (1000 * 60);
-                
+               
                 // Subtract break time (minimum 45 minutes for lunch)
                 if (this.breakStartTime) {
                     const breakEnd = this.breakEndTime || new Date();
                     const breakMinutes = Math.max(45, (breakEnd - this.breakStartTime) / (1000 * 60));
                     totalMinutes -= breakMinutes;
                 }
-                
+               
                 // Subtract 15 min daily break if not skipped
                 const skip15min = document.getElementById('skip15min')?.checked;
                 if (skip15min) {
                     totalMinutes -= 15;
                 }
-                
+               
                 return Math.max(0, totalMinutes / 60);
             }
 
             calculateBreakHours() {
                 if (!this.breakStartTime) return 0;
-                
+               
                 const breakEnd = this.breakEndTime || new Date();
                 return Math.max(0.75, (breakEnd - this.breakStartTime) / (1000 * 60 * 60)); // Minimum 45min
             }
@@ -415,7 +140,7 @@
             initializeUI() {
                 // Apply saved theme
                 this.applyTheme();
-                
+               
                 // Set current date
                 document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', {
                     weekday: 'long',
@@ -423,10 +148,10 @@
                     month: 'long',
                     day: 'numeric'
                 });
-                
+               
                 // Initialize calendar
                 this.renderCalendar();
-                
+               
                 // Show install button if PWA is available
                 this.checkPWAInstall();
             }
@@ -435,7 +160,7 @@
                 // Menu toggle
                 document.getElementById('menuToggle').addEventListener('click', () => this.toggleSidebar());
                 document.getElementById('sidebarOverlay').addEventListener('click', () => this.closeSidebar());
-                
+               
                 // Navigation
                 document.querySelectorAll('[data-tab]').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -443,28 +168,28 @@
                         this.switchTab(tab);
                     });
                 });
-                
+               
                 // Punch buttons
                 document.getElementById('startBtn').addEventListener('click', () => this.handleStart());
                 document.getElementById('endBtn').addEventListener('click', () => this.handleEnd());
                 document.getElementById('breakStartBtn').addEventListener('click', () => this.handleBreakStart());
                 document.getElementById('breakEndBtn').addEventListener('click', () => this.handleBreakEnd());
-                
+               
                 // 15 min break checkbox
                 document.getElementById('skip15min').addEventListener('change', () => {
                     this.saveData();
                     this.updateDisplay();
                 });
-                
+               
                 // Theme toggle
                 document.getElementById('themeToggle').addEventListener('click', () => this.showThemeSelector());
-                
+               
                 // Export period change
                 document.getElementById('exportPeriod').addEventListener('change', (e) => {
-                    document.getElementById('customPeriod').style.display = 
+                    document.getElementById('customPeriod').style.display =
                         e.target.value === 'custom' ? 'block' : 'none';
                 });
-                
+               
                 // Profile photo
                 document.getElementById('profilePhoto').addEventListener('change', (e) => this.handleProfilePhoto(e));
             }
@@ -472,7 +197,7 @@
             toggleSidebar() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
-                
+               
                 sidebar.classList.toggle('active');
                 overlay.classList.toggle('active');
             }
@@ -486,14 +211,14 @@
                 // Update nav items
                 document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
                 document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-                
+               
                 // Update tab content
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                 document.getElementById(tabName).classList.add('active');
-                
+               
                 // Close sidebar on mobile
                 this.closeSidebar();
-                
+               
                 // Update specific tabs
                 if (tabName === 'statistics') this.updateStatistics();
                 if (tabName === 'calendar') this.renderCalendar();
@@ -515,14 +240,14 @@
                     if (this.workStatus === 'break') {
                         this.handleBreakEnd();
                     }
-                    
+                   
                     this.endTime = new Date();
                     this.workStatus = 'off';
                     this.saveData();
                     this.updateDisplay();
-                    
+                   
                     const totalHours = this.calculateTodayHours();
-                    this.showNotification(this.getPersonalizedMessage('end'), 
+                    this.showNotification(this.getPersonalizedMessage('end'),
                         `${totalHours.toFixed(1)}h travaillées aujourd'hui`);
                 }
             }
@@ -544,7 +269,7 @@
                     this.workStatus = 'working';
                     this.saveData();
                     this.updateDisplay();
-                    
+                   
                     const breakDuration = Math.max(45, (this.breakEndTime - this.breakStartTime) / (1000 * 60));
                     this.showNotification('Pause terminée', `${Math.round(breakDuration)} minutes de pause`);
                 }
@@ -571,9 +296,9 @@
             updateStatus() {
                 const statusDot = document.getElementById('statusDot');
                 const statusText = document.getElementById('statusText');
-                
+               
                 statusDot.className = 'status-dot';
-                
+               
                 switch (this.workStatus) {
                     case 'working':
                         statusDot.classList.add('working');
@@ -596,13 +321,13 @@
                     breakStart: document.getElementById('breakStartBtn'),
                     breakEnd: document.getElementById('breakEndBtn')
                 };
-                
+               
                 // Reset all buttons
                 Object.values(buttons).forEach(btn => {
                     btn.classList.remove('active');
                     btn.classList.remove('primary');
                 });
-                
+               
                 // Set active states
                 switch (this.workStatus) {
                     case 'working':
@@ -621,13 +346,13 @@
             }
 
             updateTimes() {
-                document.getElementById('startTime').textContent = 
+                document.getElementById('startTime').textContent =
                     this.startTime ? this.formatTime(this.startTime) : '';
-                document.getElementById('endTime').textContent = 
+                document.getElementById('endTime').textContent =
                     this.endTime ? this.formatTime(this.endTime) : '';
-                document.getElementById('breakStartTime').textContent = 
+                document.getElementById('breakStartTime').textContent =
                     this.breakStartTime ? this.formatTime(this.breakStartTime) : '';
-                document.getElementById('breakEndTime').textContent = 
+                document.getElementById('breakEndTime').textContent =
                     this.breakEndTime ? this.formatTime(this.breakEndTime) : '';
             }
 
@@ -644,8 +369,8 @@
             updateProgress() {
                 const todayHours = this.calculateTodayHours();
                 const progress = Math.min(100, (todayHours / this.dailyHours) * 100);
-                
-                document.getElementById('dayProgress').textContent = 
+               
+                document.getElementById('dayProgress').textContent =
                     `${this.formatHours(todayHours)} / ${this.dailyHours}h00`;
                 document.getElementById('dayProgressBar').style.width = `${progress}%`;
             }
@@ -656,24 +381,24 @@
                 const startOfWeek = new Date(now);
                 startOfWeek.setDate(now.getDate() - now.getDay() + 1);
                 startOfWeek.setHours(0, 0, 0, 0);
-                
+               
                 let totalHours = 0;
                 for (let i = 0; i < 7; i++) {
                     const date = new Date(startOfWeek);
                     date.setDate(startOfWeek.getDate() + i);
                     const dateStr = date.toISOString().split('T')[0];
-                    
+                   
                     if (data[dateStr]) {
                         totalHours += data[dateStr].totalHours || 0;
                     }
-                    
+                   
                     // Add special days (congé/maladie/école = 7h)
                     const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
                     if (specialDays[dateStr]) {
                         totalHours += 7;
                     }
                 }
-                
+               
                 return totalHours;
             }
 
@@ -681,15 +406,15 @@
                 const nameEl = document.getElementById('welcomeName');
                 const roleEl = document.getElementById('welcomeRole');
                 const avatarEl = document.getElementById('profileAvatar');
-                
+               
                 if (this.userProfile.firstName) {
                     nameEl.textContent = `Bonjour ${this.userProfile.firstName} !`;
                 } else {
                     nameEl.textContent = 'Bonjour !';
                 }
-                
+               
                 roleEl.textContent = this.userProfile.status.charAt(0).toUpperCase() + this.userProfile.status.slice(1);
-                
+               
                 if (this.userProfile.photo) {
                     avatarEl.innerHTML = `<img src="${this.userProfile.photo}" alt="Photo de profil">`;
                 } else {
@@ -709,16 +434,16 @@
 
             showNotification(title, message) {
                 if (!this.settings.notifications) return;
-                
+               
                 const notification = document.createElement('div');
                 notification.className = 'notification';
                 notification.innerHTML = `
                     <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
                     <div style="opacity: 0.9;">${message}</div>
                 `;
-                
+               
                 document.body.appendChild(notification);
-                
+               
                 setTimeout(() => {
                     notification.style.animation = 'slideOut 0.3s ease';
                     setTimeout(() => document.body.removeChild(notification), 300);
@@ -728,23 +453,23 @@
             checkNotifications() {
                 if (this.workStatus === 'working') {
                     const todayHours = this.calculateTodayHours();
-                    
+                   
                     // 7h notification
                     if (todayHours >= 7 && !this.notified7Hours) {
-                        this.showNotification('🎯 Objectif atteint !', 
+                        this.showNotification('🎯 Objectif atteint !',
                             `Vous avez travaillé ${this.formatHours(todayHours)} aujourd'hui`);
                         this.notified7Hours = true;
                     }
-                    
+                   
                     // Break reminder after 4h
                     const workTime = (new Date() - this.startTime) / (1000 * 60 * 60);
                     if (workTime > 4 && !this.breakStartTime && !this.notifiedBreak) {
-                        this.showNotification('Pause recommandée', 
+                        this.showNotification('Pause recommandée',
                             'Vous travaillez depuis plus de 4h. Pensez à prendre une pause !');
                         this.notifiedBreak = true;
                     }
                 }
-                
+               
                 // Reset notifications at midnight
                 const now = new Date();
                 if (now.getHours() === 0 && now.getMinutes() === 0) {
@@ -755,7 +480,7 @@
 
             applyTheme() {
                 const root = document.documentElement;
-                
+               
                 // Apply color theme
                 switch (this.settings.theme) {
                     case 'blue':
@@ -767,12 +492,12 @@
                     default:
                         document.body.removeAttribute('data-theme');
                 }
-                
+               
                 // Apply dark mode
                 if (this.settings.darkMode) {
                     document.body.setAttribute('data-theme', 'dark');
                 }
-                
+               
                 // Update form values
                 if (document.getElementById('colorTheme')) {
                     document.getElementById('colorTheme').value = this.settings.theme;
@@ -788,12 +513,12 @@
                 const themes = ['purple', 'blue', 'green'];
                 const currentTheme = this.settings.theme;
                 const nextThemeIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
-                
+               
                 this.settings.theme = themes[nextThemeIndex];
                 localStorage.setItem('timeTrackerV2Settings', JSON.stringify(this.settings));
                 this.applyTheme();
-                
-                this.showNotification('Thème changé', 
+               
+                this.showNotification('Thème changé',
                     `Thème ${themes[nextThemeIndex]} appliqué`);
             }
 
@@ -810,84 +535,88 @@
                 }
             }
 
+            saveProfile() {
+                localStorage.setItem('timeTrackerV2Profile', JSON.stringify(this.userProfile));
+            }
+
             renderCalendar() {
                 const month = this.currentCalendarMonth;
-                document.getElementById('currentMonth').textContent = 
+                document.getElementById('currentMonth').textContent =
                     month.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-                
+               
                 const grid = document.getElementById('calendarGrid');
                 grid.innerHTML = '';
-                
+               
                 // Add day headers
                 const dayHeaders = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
                 dayHeaders.forEach(day => {
                     const header = document.createElement('div');
                     header.style.cssText = `
-                        padding: 8px; text-align: center; font-weight: 600; 
+                        padding: 8px; text-align: center; font-weight: 600;
                         color: var(--text-secondary); font-size: 12px;
                     `;
                     header.textContent = day;
                     grid.appendChild(header);
                 });
-                
+               
                 const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
                 const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0);
                 const daysInMonth = lastDay.getDate();
                 const startingDayOfWeek = (firstDay.getDay() + 6) % 7;
-                
+               
                 // Add empty cells
                 for (let i = 0; i < startingDayOfWeek; i++) {
                     grid.appendChild(document.createElement('div'));
                 }
-                
+               
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
                 const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-                
+               
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayElement = document.createElement('div');
                     const dateStr = new Date(month.getFullYear(), month.getMonth(), day)
                         .toISOString().split('T')[0];
-                    
+                   
                     dayElement.style.cssText = `
-                        aspect-ratio: 1; border: 1px solid var(--border-color); 
-                        border-radius: 8px; display: flex; flex-direction: column; 
-                        align-items: center; justify-content: center; font-size: 12px; 
+                        aspect-ratio: 1; border: 1px solid var(--border-color);
+                        border-radius: 8px; display: flex; flex-direction: column;
+                        align-items: center; justify-content: center; font-size: 12px;
                         cursor: pointer; transition: all 0.3s ease; padding: 4px;
                     `;
-                    
+                   
                     dayElement.textContent = day;
-                    
+                   
                     // Today
                     const today = new Date().toISOString().split('T')[0];
                     if (dateStr === today) {
                         dayElement.style.background = 'var(--primary)';
                         dayElement.style.color = 'white';
                     }
-                    
+                   
                     // Has hours
                     if (data[dateStr] && data[dateStr].totalHours > 0) {
                         dayElement.style.borderColor = 'var(--success)';
                         dayElement.style.background = 'var(--success)';
                         dayElement.style.color = 'white';
-                        
+                       
                         const hours = document.createElement('div');
                         hours.style.fontSize = '10px';
                         hours.textContent = this.formatHours(data[dateStr].totalHours);
                         dayElement.appendChild(hours);
                     }
-                    
+                   
                     // Special days
                     if (specialDays[dateStr]) {
                         dayElement.style.borderColor = 'var(--warning)';
                         dayElement.style.background = 'var(--warning)';
                         dayElement.style.color = 'white';
-                        
+                       
                         const type = document.createElement('div');
                         type.style.fontSize = '10px';
                         type.textContent = specialDays[dateStr].type;
                         dayElement.appendChild(type);
                     }
-                    
+                   
                     dayElement.addEventListener('click', () => this.showDayDetails(dateStr));
                     grid.appendChild(dayElement);
                 }
@@ -898,9 +627,9 @@
                 const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
                 const dayData = data[dateStr];
                 const specialDay = specialDays[dateStr];
-                
+               
                 let details = `📅 ${new Date(dateStr).toLocaleDateString('fr-FR')}\n\n`;
-                
+               
                 if (specialDay) {
                     details += `${specialDay.type.toUpperCase()} - 7h comptabilisées automatiquement`;
                 } else if (dayData && dayData.totalHours > 0) {
@@ -911,22 +640,22 @@
                 } else {
                     details += 'Aucune donnée pour ce jour';
                 }
-                
+               
                 alert(details);
             }
 
             updateStatistics() {
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
                 const dates = Object.keys(data).sort();
-                
+               
                 const daysWorked = dates.filter(date => data[date].totalHours > 0).length;
                 const totalHours = dates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
                 const avgHours = daysWorked > 0 ? totalHours / daysWorked : 0;
-                
+               
                 const currentMonth = new Date().toISOString().substr(0, 7);
                 const monthDates = dates.filter(date => date.startsWith(currentMonth));
                 const monthHours = monthDates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
-                
+               
                 document.getElementById('totalDaysWorked').textContent = daysWorked;
                 document.getElementById('averageDailyHours').textContent = this.formatHours(avgHours);
                 document.getElementById('monthlyHours').textContent = this.formatHours(monthHours);
@@ -943,7 +672,7 @@
                 window.addEventListener('beforeinstallprompt', (e) => {
                     e.preventDefault();
                     deferredPrompt = e;
-                    
+                   
                     const installBtn = document.getElementById('installBtn');
                     installBtn.style.display = 'block';
                     installBtn.addEventListener('click', () => {
@@ -968,12 +697,12 @@
                 status: document.getElementById('userStatus').value,
                 photo: window.timeTracker.userProfile.photo
             };
-            
+           
             window.timeTracker.userProfile = profile;
             localStorage.setItem('timeTrackerV2Profile', JSON.stringify(profile));
             window.timeTracker.updateWelcomeMessage();
             window.timeTracker.showNotification('Profil sauvegardé', 'Vos informations ont été mises à jour');
-            
+           
             // Update form fields
             document.getElementById('userFirstName').value = profile.firstName;
             document.getElementById('userLastName').value = profile.lastName;
@@ -989,11 +718,11 @@
                 weeklyGoal: parseFloat(document.getElementById('weeklyGoal').value),
                 notifications: document.getElementById('notificationsEnabled').checked
             };
-            
+           
             window.timeTracker.settings = settings;
             window.timeTracker.dailyHours = settings.dailyHours;
             window.timeTracker.weeklyGoal = settings.weeklyGoal;
-            
+           
             localStorage.setItem('timeTrackerV2Settings', JSON.stringify(settings));
             window.timeTracker.applyTheme();
             window.timeTracker.updateDisplay();
@@ -1005,17 +734,17 @@
             const type = document.getElementById('constraintType').value;
             const time = document.getElementById('constraintTime').value;
             const reason = document.getElementById('constraintReason').value;
-            
+           
             if (!day || !type || !time) {
                 window.timeTracker.showNotification('Erreur', 'Veuillez remplir tous les champs');
                 return;
             }
-            
+           
             const constraint = { day, type, time, reason: reason || 'Sans motif' };
             window.timeTracker.constraints.push(constraint);
-            
+           
             updateConstraintsList();
-            
+           
             // Reset form
             document.getElementById('constraintDay').value = '';
             document.getElementById('constraintType').value = '';
@@ -1025,12 +754,12 @@
 
         function updateConstraintsList() {
             const list = document.getElementById('constraintsList');
-            
+           
             if (window.timeTracker.constraints.length === 0) {
                 list.innerHTML = '<p style="color: var(--text-secondary); font-style: italic;">Aucune contrainte ajoutée</p>';
                 return;
             }
-            
+           
             list.innerHTML = window.timeTracker.constraints.map((c, i) => `
                 <div style="background: var(--gray-100); padding: 12px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center;">
                     <div>
@@ -1052,35 +781,35 @@
         function generatePlanning() {
             const currentHours = parseFloat(document.getElementById('currentWeekHours').value) || 0;
             const remainingHours = window.timeTracker.weeklyGoal - currentHours;
-            
+           
             if (remainingHours <= 0) {
-                document.getElementById('planningResult').innerHTML = 
+                document.getElementById('planningResult').innerHTML =
                     '<div style="color: var(--success); font-weight: 600;">✅ Objectif hebdomadaire déjà atteint !</div>';
                 document.getElementById('planningResult').style.display = 'block';
                 return;
             }
-            
+           
             // Generate planning logic here
             let planning = `<div style="background: var(--gray-100); padding: 16px; border-radius: 12px;">
                 <h4>📊 Analyse</h4>
                 <p>Heures restantes: ${remainingHours.toFixed(1)}h</p>
                 <p>Contraintes: ${window.timeTracker.constraints.length}</p>
             </div>`;
-            
-            planning += '<div style="margin-top: 16px;"><h4>📅 Planning suggéré</h4>';
-            
+           
+            planning += '<div style="margin-top: 16px;"><h4>📋 Planning suggéré</h4>';
+           
             const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
             const today = new Date().getDay();
             let totalPlanned = 0;
-            
+           
             for (let i = 1; i <= 5; i++) {
                 if (i < today) continue;
-                
+               
                 const dayName = days[i - 1];
                 const constraint = window.timeTracker.constraints.find(c => c.day === dayName);
                 let plannedHours = 7;
                 let schedule = '';
-                
+               
                 if (constraint) {
                     if (constraint.type === 'early_leave') {
                         plannedHours = Math.max(4, parseFloat(constraint.time.split(':')[0]) - 9);
@@ -1096,20 +825,20 @@
                     const endTime = `${Math.floor(8 + plannedHours + 1)}:${((8 + plannedHours + 1) % 1 * 60).toString().padStart(2, '0')}`;
                     schedule = `08:00 - ${endTime}`;
                 }
-                
+               
                 planning += `<div style="margin: 8px 0; padding: 12px; background: white; border-radius: 8px; border-left: 4px solid var(--primary);">
                     <strong>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</strong><br>
                     ${schedule}<br>
                     <small>Total: ${plannedHours.toFixed(1)}h</small>
                 </div>`;
-                
+               
                 totalPlanned += plannedHours;
             }
-            
+           
             planning += `<div style="margin-top: 16px; padding: 12px; background: var(--primary); color: white; border-radius: 8px; text-align: center;">
                 <strong>Total planifié: ${totalPlanned.toFixed(1)}h / ${window.timeTracker.weeklyGoal}h</strong>
             </div></div>`;
-            
+           
             document.getElementById('planningResult').innerHTML = planning;
             document.getElementById('planningResult').style.display = 'block';
         }
@@ -1128,14 +857,14 @@
         function saveSpecialDay() {
             const date = document.getElementById('specialDate').value;
             const type = document.getElementById('specialType').value;
-            
+           
             if (!date || !type) return;
-            
+           
             const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
             specialDays[date] = { type, date: new Date().toISOString() };
-            
+           
             localStorage.setItem('timeTrackerV2SpecialDays', JSON.stringify(specialDays));
-            
+           
             closeModal('specialDayModal');
             window.timeTracker.renderCalendar();
             window.timeTracker.showNotification('Jour spécial ajouté', `${type} enregistré pour le ${new Date(date).toLocaleDateString('fr-FR')}`);
@@ -1148,17 +877,17 @@
         function loadDayForEdit() {
             const dateStr = document.getElementById('editDate').value;
             if (!dateStr) return;
-            
+           
             const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
             const dayData = data[dateStr] || {};
-            
-            document.getElementById('editStartTime').value = 
+           
+            document.getElementById('editStartTime').value =
                 dayData.startTime ? new Date(dayData.startTime).toTimeString().substr(0, 5) : '';
-            document.getElementById('editEndTime').value = 
+            document.getElementById('editEndTime').value =
                 dayData.endTime ? new Date(dayData.endTime).toTimeString().substr(0, 5) : '';
-            document.getElementById('editBreakStart').value = 
+            document.getElementById('editBreakStart').value =
                 dayData.breakStartTime ? new Date(dayData.breakStartTime).toTimeString().substr(0, 5) : '';
-            document.getElementById('editBreakEnd').value = 
+            document.getElementById('editBreakEnd').value =
                 dayData.breakEndTime ? new Date(dayData.breakEndTime).toTimeString().substr(0, 5) : '';
         }
 
@@ -1168,37 +897,37 @@
             const endTime = document.getElementById('editEndTime').value;
             const breakStart = document.getElementById('editBreakStart').value;
             const breakEnd = document.getElementById('editBreakEnd').value;
-            
+           
             if (!dateStr) return;
-            
+           
             const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-            
+           
             const dayData = {
                 startTime: startTime ? new Date(`${dateStr}T${startTime}`).toISOString() : null,
                 endTime: endTime ? new Date(`${dateStr}T${endTime}`).toISOString() : null,
                 breakStartTime: breakStart ? new Date(`${dateStr}T${breakStart}`).toISOString() : null,
                 breakEndTime: breakEnd ? new Date(`${dateStr}T${breakEnd}`).toISOString() : null
             };
-            
+           
             // Calculate hours
             if (dayData.startTime && dayData.endTime) {
                 let totalMinutes = (new Date(dayData.endTime) - new Date(dayData.startTime)) / (1000 * 60);
-                
+               
                 if (dayData.breakStartTime && dayData.breakEndTime) {
                     const breakMinutes = Math.max(45, (new Date(dayData.breakEndTime) - new Date(dayData.breakStartTime)) / (1000 * 60));
                     totalMinutes -= breakMinutes;
                     dayData.breakHours = breakMinutes / 60;
                 }
-                
+               
                 // 15 min break
                 totalMinutes -= 15;
-                
+               
                 dayData.totalHours = Math.max(0, totalMinutes / 60);
             }
-            
+           
             data[dateStr] = dayData;
             localStorage.setItem('timeTrackerV2Data', JSON.stringify(data));
-            
+           
             closeModal('editTimesModal');
             window.timeTracker.loadData();
             window.timeTracker.updateDisplay();
@@ -1208,11 +937,11 @@
         function previewData() {
             const period = document.getElementById('exportPeriod').value;
             const data = getExportData(period);
-            
+           
             let preview = '<div style="max-height: 300px; overflow-y: auto; margin-top: 16px;">';
             preview += '<table style="width: 100%; border-collapse: collapse;">';
             preview += '<tr style="background: var(--gray-100);"><th style="padding: 8px;">Date</th><th style="padding: 8px;">Heures</th><th style="padding: 8px;">Arrivée</th><th style="padding: 8px;">Départ</th></tr>';
-            
+           
             data.forEach(row => {
                 preview += `<tr style="border-bottom: 1px solid var(--border-color);">
                     <td style="padding: 8px;">${row.date}</td>
@@ -1221,9 +950,9 @@
                     <td style="padding: 8px;">${row.end}</td>
                 </tr>`;
             });
-            
+           
             preview += '</table></div>';
-            
+           
             document.getElementById('dataPreview').innerHTML = preview;
             document.getElementById('dataPreview').style.display = 'block';
         }
@@ -1232,10 +961,10 @@
             const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
             const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
             const result = [];
-            
+           
             let startDate, endDate;
             const today = new Date();
-            
+           
             switch (period) {
                 case 'week':
                     startDate = new Date(today);
@@ -1252,14 +981,14 @@
                     endDate = new Date(document.getElementById('exportDateTo').value);
                     break;
             }
-            
+           
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                 const dateStr = d.toISOString().split('T')[0];
                 const dayData = data[dateStr];
                 const specialDay = specialDays[dateStr];
-                
+               
                 let hours = '0h00', start = '-', end = '-';
-                
+               
                 if (specialDay) {
                     hours = '7h00';
                     start = specialDay.type;
@@ -1269,7 +998,7 @@
                     start = dayData.startTime ? window.timeTracker.formatTime(new Date(dayData.startTime)) : '-';
                     end = dayData.endTime ? window.timeTracker.formatTime(new Date(dayData.endTime)) : '-';
                 }
-                
+               
                 result.push({
                     date: d.toLocaleDateString('fr-FR'),
                     hours,
@@ -1277,19 +1006,19 @@
                     end
                 });
             }
-            
+           
             return result;
         }
 
         function downloadExcel() {
             const period = document.getElementById('exportPeriod').value;
             const data = getExportData(period);
-            
+           
             let csvContent = 'Date,Heures,Arrivée,Départ\n';
             data.forEach(row => {
                 csvContent += `${row.date},${row.hours},${row.start},${row.end}\n`;
             });
-            
+           
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -1297,18 +1026,18 @@
             link.download = `timetracker_${period}_${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
             URL.revokeObjectURL(url);
-            
+           
             window.timeTracker.showNotification('Export réussi', 'Fichier téléchargé');
         }
 
         function sendReport() {
             const message = document.getElementById('reportIssue').value;
             if (!message.trim()) return;
-            
+           
             const subject = 'TimeTracker Pro v2 - Support';
             const body = encodeURIComponent(`Bonjour Ryan,\n\n${message}\n\nCordialement`);
             const mailtoLink = `mailto:Ryan.monedero@sanofi.com?subject=${subject}&body=${body}`;
-            
+           
             window.open(mailtoLink);
             document.getElementById('reportIssue').value = '';
             window.timeTracker.showNotification('Email ouvert', 'Votre client email va s\'ouvrir');
@@ -1321,7 +1050,7 @@
         // Initialize app
         document.addEventListener('DOMContentLoaded', () => {
             window.timeTracker = new TimeTrackerV2();
-            
+           
             // Load profile form
             const profile = window.timeTracker.userProfile;
             if (document.getElementById('userFirstName')) {
@@ -1329,7 +1058,7 @@
                 document.getElementById('userLastName').value = profile.lastName || '';
                 document.getElementById('userStatus').value = profile.status || 'alternant';
             }
-            
+           
             // Close modals when clicking outside
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.addEventListener('click', (e) => {
@@ -1347,18 +1076,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TimeTracker Pro v2 - Sanofi</title>
-    
+   
     <!-- PWA Configuration -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8B5A96">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="TimeTracker Pro v2">
-    
+   
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
+   
     <style>
         :root {
             --primary: #8B5A96;
@@ -1381,7 +1110,7 @@
             --gray-700: #495057;
             --gray-800: #343A40;
             --gray-900: #212529;
-            
+           
             /* Theme variables */
             --bg-primary: var(--white);
             --bg-secondary: var(--gray-100);
@@ -1911,11 +1640,11 @@
             .main-content {
                 padding: 12px;
             }
-            
+           
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            
+           
             .card {
                 padding: 16px;
             }
@@ -2019,6 +1748,37 @@
             color: var(--text-secondary);
             margin-top: 4px;
         }
+
+        /* Donation specific styles */
+        .donation-card {
+            background: linear-gradient(135deg, var(--warning), #E67E22);
+            color: white;
+            text-align: center;
+        }
+
+        .donation-card .card-title {
+            color: white;
+        }
+
+        .donation-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .donation-feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .donation-feature i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -2121,7 +1881,7 @@
                             Pointage
                         </h3>
                     </div>
-                    
+                   
                     <div class="punch-grid">
                         <button class="punch-btn primary" id="startBtn">
                             <div class="icon"><i class="fas fa-play"></i></div>
@@ -2176,7 +1936,7 @@
                             Statistiques
                         </h3>
                     </div>
-                    
+                   
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value" id="todayHours">0h00</div>
@@ -2203,22 +1963,22 @@
                             Mon Profil
                         </h3>
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Photo de profil</label>
                         <input type="file" class="form-control" id="profilePhoto" accept="image/*">
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Prénom</label>
                         <input type="text" class="form-control" id="userFirstName" placeholder="Votre prénom">
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Nom</label>
                         <input type="text" class="form-control" id="userLastName" placeholder="Votre nom">
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Statut</label>
                         <select class="form-control" id="userStatus">
@@ -2229,7 +1989,7 @@
                             <option value="testeur">Testeur</option>
                         </select>
                     </div>
-                    
+                   
                     <button class="btn btn-lg" onclick="saveProfile()">
                         <i class="fas fa-save"></i>
                         Sauvegarder le profil
@@ -2246,7 +2006,7 @@
                             Paramètres
                         </h3>
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Thème de couleur</label>
                         <select class="form-control" id="colorTheme">
@@ -2255,7 +2015,7 @@
                             <option value="green">Vert</option>
                         </select>
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Mode sombre</label>
                         <div class="form-check">
@@ -2263,7 +2023,7 @@
                             <label for="darkMode">Activer le mode sombre</label>
                         </div>
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Horaires de travail</label>
                         <div class="form-check">
@@ -2271,17 +2031,17 @@
                             <label for="flexibleSchedule">Horaires variables (7h-10h / départ 15h30+)</label>
                         </div>
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Heures de travail par jour</label>
                         <input type="number" class="form-control" id="dailyHours" value="7" step="0.5" min="1" max="12">
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Objectif hebdomadaire</label>
                         <input type="number" class="form-control" id="weeklyGoal" value="35" step="0.5" min="1" max="50">
                     </div>
-                    
+                   
                     <div class="form-group">
                         <label class="form-label">Notifications</label>
                         <div class="form-check">
@@ -2289,12 +2049,12 @@
                             <label for="notificationsEnabled">Activer les notifications</label>
                         </div>
                     </div>
-                    
+                   
                     <button class="btn btn-lg" onclick="saveSettings()">
                         <i class="fas fa-save"></i>
                         Sauvegarder
                     </button>
-                    
+                   
                     <button class="btn btn-secondary btn-lg" onclick="openEditTimes()" style="margin-left: 10px;">
                         <i class="fas fa-edit"></i>
                         Modifier horaires
@@ -2302,7 +2062,353 @@
                 </div>
             </div>
 
-            <!-- Support Tab -->
+            <!-- Support Tab - NETTOYÉ SANS PAYPAL -->
             <div id="support" class="tab-content">
                 <div class="card">
                     <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-life-ring"></i>
+                            Support & Contact
+                        </h3>
+                    </div>
+                   
+                    <div class="form-group">
+                        <label class="form-label">Signaler un problème</label>
+                        <textarea class="form-control" id="reportIssue" rows="4" placeholder="Décrivez votre problème ou votre question..."></textarea>
+                    </div>
+                   
+                    <button class="btn btn-lg" onclick="sendReport()">
+                        <i class="fas fa-envelope"></i>
+                        Envoyer le rapport
+                    </button>
+                   
+                    <div style="margin-top: 20px; padding: 16px; background: var(--gray-100); border-radius: 12px;">
+                        <h4 style="margin-bottom: 12px; color: var(--text-primary);">Informations de contact</h4>
+                        <p style="margin: 8px 0; color: var(--text-secondary);">
+                            <i class="fas fa-envelope" style="margin-right: 8px;"></i>
+                            <strong>Email :</strong> Ryan.monedero@sanofi.com
+                        </p>
+                        <p style="margin: 8px 0; color: var(--text-secondary);">
+                            <i class="fab fa-linkedin" style="margin-right: 8px;"></i>
+                            <strong>LinkedIn :</strong> 
+                            <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank" style="color: var(--primary);">
+                                Ryan MONEDERO
+                            </a>
+                        </p>
+                        <p style="margin: 8px 0; color: var(--text-secondary);">
+                            <i class="fas fa-code" style="margin-right: 8px;"></i>
+                            <strong>Version :</strong> TimeTracker Pro v2.0.0
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Me soutenir Tab - ONGLET DÉDIÉ -->
+            <div id="donate" class="tab-content">
+                <div class="card donation-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-heart"></i>
+                            Soutenir le développement
+                        </h3>
+                    </div>
+                   
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 12px; color: white;">Cette app vous fait gagner du temps ?</h4>
+                        <p style="margin-bottom: 16px; opacity: 0.9;">
+                            TimeTracker Pro v2 est développé bénévolement pour améliorer votre quotidien professionnel. 
+                            Votre soutien m'aide à maintenir et améliorer l'application.
+                        </p>
+                    </div>
+
+                    <div class="donation-features">
+                        <div class="donation-feature">
+                            <i class="fas fa-clock"></i>
+                            <div style="font-weight: 600;">Gain de temps</div>
+                            <div style="font-size: 12px; opacity: 0.8;">Pointage automatisé</div>
+                        </div>
+                        <div class="donation-feature">
+                            <i class="fas fa-chart-line"></i>
+                            <div style="font-weight: 600;">Suivi précis</div>
+                            <div style="font-size: 12px; opacity: 0.8;">Statistiques détaillées</div>
+                        </div>
+                        <div class="donation-feature">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div style="font-weight: 600;">PWA</div>
+                            <div style="font-size: 12px; opacity: 0.8;">Utilisable hors-ligne</div>
+                        </div>
+                        <div class="donation-feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <div style="font-weight: 600;">Sécurisé</div>
+                            <div style="font-size: 12px; opacity: 0.8;">Données locales</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <a href="https://paypal.me/ryanmonedero7" class="btn btn-lg" target="_blank" 
+                           style="background: white; color: var(--warning); border: 2px solid white; font-weight: 600; margin: 16px 0;">
+                            <i class="fab fa-paypal"></i>
+                            Faire un don PayPal
+                        </a>
+                        
+                        <div style="margin-top: 16px; font-size: 13px; opacity: 0.8;">
+                            <p>💝 Montant libre • Paiement sécurisé PayPal</p>
+                            <p>🙏 Merci de votre soutien !</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 12px;">
+                        <h5 style="margin-bottom: 8px; color: white;">À quoi servent vos dons ?</h5>
+                        <ul style="text-align: left; font-size: 13px; opacity: 0.9;">
+                            <li>Maintenance et mises à jour de l'application</li>
+                            <li>Développement de nouvelles fonctionnalités</li>
+                            <li>Support technique et correction de bugs</li>
+                            <li>Hébergement et infrastructure</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Planning Tab -->
+            <div id="planning" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-brain"></i>
+                            Planning IA
+                        </h3>
+                    </div>
+                   
+                    <div class="form-group">
+                        <label class="form-label">Heures déjà effectuées cette semaine</label>
+                        <input type="number" class="form-control" id="currentWeekHours" placeholder="0" step="0.5" min="0" max="35">
+                    </div>
+                   
+                    <div class="form-group">
+                        <label class="form-label">Ajouter une contrainte</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <select class="form-control" id="constraintDay">
+                                <option value="">Jour</option>
+                                <option value="lundi">Lundi</option>
+                                <option value="mardi">Mardi</option>
+                                <option value="mercredi">Mercredi</option>
+                                <option value="jeudi">Jeudi</option>
+                                <option value="vendredi">Vendredi</option>
+                            </select>
+                            <select class="form-control" id="constraintType">
+                                <option value="">Type</option>
+                                <option value="early_leave">Départ anticipé</option>
+                                <option value="late_arrival">Arrivée tardive</option>
+                                <option value="long_break">Pause longue</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="time" class="form-control" id="constraintTime" style="flex: 1;">
+                            <input type="text" class="form-control" id="constraintReason" placeholder="Raison" style="flex: 2;">
+                            <button class="btn" onclick="addConstraint()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                   
+                    <div id="constraintsList" style="margin: 20px 0;"></div>
+                   
+                    <button class="btn btn-lg" onclick="generatePlanning()">
+                        <i class="fas fa-magic"></i>
+                        Générer le planning
+                    </button>
+                   
+                    <div id="planningResult" style="margin-top: 20px; display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Calendar Tab -->
+            <div id="calendar" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar"></i>
+                            Calendrier
+                        </h3>
+                        <div>
+                            <button class="btn-icon" onclick="navigateCalendar(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span id="currentMonth" style="margin: 0 15px; font-weight: 600;"></span>
+                            <button class="btn-icon" onclick="navigateCalendar(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                   
+                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 20px;"></div>
+                   
+                    <button class="btn" onclick="openSpecialDayModal()">
+                        <i class="fas fa-plus"></i>
+                        Ajouter congé/maladie/école
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div id="statistics" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Statistiques détaillées
+                        </h3>
+                    </div>
+                   
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDaysWorked">0</div>
+                            <div class="stat-label">Jours travaillés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="averageDailyHours">0h00</div>
+                            <div class="stat-label">Moyenne/jour</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="monthlyHours">0h00</div>
+                            <div class="stat-label">Ce mois</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="export" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-download"></i>
+                            Export Excel
+                        </h3>
+                    </div>
+                   
+                    <div class="form-group">
+                        <label class="form-label">Période d'export</label>
+                        <select class="form-control" id="exportPeriod">
+                            <option value="week">Cette semaine</option>
+                            <option value="month">Ce mois</option>
+                            <option value="custom">Période personnalisée</option>
+                        </select>
+                    </div>
+                   
+                    <div id="customPeriod" style="display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label class="form-label">Du</label>
+                                <input type="date" class="form-control" id="exportDateFrom">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Au</label>
+                                <input type="date" class="form-control" id="exportDateTo">
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-lg" onclick="downloadExcel()">
+                            <i class="fas fa-file-excel"></i>
+                            Télécharger Excel
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="previewData()">
+                            <i class="fas fa-eye"></i>
+                            Aperçu
+                        </button>
+                    </div>
+                   
+                    <div id="dataPreview" style="margin-top: 20px; display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer inside navbar for better positioning -->
+    </main>
+
+    <!-- Footer moved to navbar level -->
+    <div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); z-index: 1001;">
+        <p>
+            Développé par <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank">Ryan MONEDERO</a>
+            | TimeTracker Pro v2
+        </p>
+    </div>
+
+    <!-- Modals -->
+    <div id="editTimesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Modifier les horaires</h3>
+                <button class="modal-close" onclick="closeModal('editTimesModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="editDate">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Arrivée</label>
+                        <input type="time" class="form-control" id="editStartTime">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Départ</label>
+                        <input type="time" class="form-control" id="editEndTime">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Début pause</label>
+                        <input type="time" class="form-control" id="editBreakStart">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fin pause</label>
+                        <input type="time" class="form-control" id="editBreakEnd">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="saveEditedTimes()">
+                        <i class="fas fa-save"></i>
+                        Sauvegarder
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadDayForEdit()">
+                        <i class="fas fa-upload"></i>
+                        Charger le jour
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="specialDayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Ajouter un jour spécial</h3>
+                <button class="modal-close" onclick="closeModal('specialDayModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="specialDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-control" id="specialType">
+                        <option value="conge">Congé</option>
+                        <option value="maladie">Arrêt maladie</option>
+                        <option value="ecole">Journée école</option>
+                    </select>
+                </div>
+                <button class="btn btn-lg" onclick="saveSpecialDay()">
+                    <i class="fas fa-save"></i>
+                    Sauvegarder
+                </button>
+            </div>
+        </div>
+    </div>
