@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeTracker Pro v3 - Sanofi</title>
+   
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5A96">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TimeTracker Pro v3">
+   
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+   
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+        // Configuration Firebase (à remplacer par ta vraie config)
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "timetracker-pro.firebaseapp.com",
+            projectId: "timetracker-pro",
+            storageBucket: "timetracker-pro.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "your-app-id"
+        };
+
+        // Initialiser Firebase
+        const app = initializeApp(firebaseConfig);
+        window.firebaseAuth = getAuth(app);
+        window.firebaseDb = getFirestore(app);
+        window.googleProvider = new GoogleAuthProvider();
+        
+        // Exposer les fonctions nécessaires
+        window.firebaseUtils = {
+            onAuthStateChanged,
+            signInWithPopup,
+            signOut,
+            doc,
+            setDoc,
+            getDoc,
+            onSnapshot
+        };
+    </script>
+   
+    <style>
+        :root {
+            --primary: #8B5A96;
+            --primary-dark: #6B4476;
+            --primary-light: #B087C4;
+            --secondary: #2C3E50;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --info: #3498DB;
+            --light: #ECF0F1;
+            --dark: #2C3E50;
+            --white: #FFFFFF;
+            --gray-100: #F8F9FA;
+            --gray-200: #E9ECEF;
+            --gray-300: #DEE2E6;
+            --gray-400: #CED4DA;
+            --gray-500: #ADB5BD;
+            --gray-600: #6C757D;
+            --gray-700: #495057;
+            --gray-800: #343A40;
+            --gray-900: #212529;
+           
+            /* Theme variables */
+            --bg-primary: var(--white);
+            --bg-secondary: var(--gray-100);
+            --text-primary: var(--gray-900);
+            --text-secondary: var(--gray-600);
+            --border-color: var(--gray-300);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --border-color: #444444;
+        }
+
+        [data-theme="green"] {
+            --primary: #27AE60;
+            --primary-dark: #1E8449;
+            --primary-light: #58D68D;
+        }
+
+        [data-theme="blue"] {
+            --primary: #3498DB;
+            --primary-dark: #2E86C1;
+            --primary-light: #85C1E9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-primary);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: var(--gray-200);
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--gray-200);
+            color: var(--primary);
+        }
+
+        /* Cloud sync indicator */
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: var(--gray-100);
+        }
+
+        .sync-indicator.synced {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+
+        .sync-indicator.syncing {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+        }
+
+        .sync-indicator.offline {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--gray-600);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -280px;
+            width: 280px;
+            height: calc(100vh - 60px);
+            background: var(--bg-primary);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            padding: 20px;
+            min-height: calc(100vh - 60px);
+            max-height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-500);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-600);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 16px;
+            border-radius: 16px;
+        }
+
+        .btn-google {
+            background: #4285f4;
+            color: white;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-google:hover {
+            background: #3367d6;
+        }
+
+        /* Punch buttons */
+        .punch-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .punch-btn {
+            background: var(--gray-200);
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .punch-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .punch-btn.active {
+            background: var(--success);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .punch-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .punch-btn .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .punch-btn .text {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .punch-btn .time {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-secondary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gray-400);
+        }
+
+        .status-dot.working {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.break {
+            background: var(--warning);
+        }
+
+        .status-dot.off {
+            background: var(--gray-400);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--gray-300);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .form-check input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        /* Profile section */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h3 {
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        /* Google connection section */
+        .connection-status {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .connection-status.connected {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid var(--success);
+        }
+
+        .connection-status.disconnected {
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px solid var(--warning);
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .app-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .app-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            max-width: 500px;
+            margin: 60px auto;
+            border-radius: 16px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* Break checkbox */
+        .break-option {
+            background: var(--gray-100);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+
+        .break-option .form-check {
+            font-weight: 500;
+        }
+
+        .break-option small {
+            display: block;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 10000;
+            max-width: 320px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 12px;
+            }
+           
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+           
+            .card {
+                padding: 16px;
+            }
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <i class="fas fa-clock"></i>
+            TimeTracker Pro v3
+        </div>
+        <div class="header-actions">
+            <!-- Sync indicator -->
+            <div class="sync-indicator offline" id="syncIndicator">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Local</span>
+            </div>
+            <button class="btn-icon" id="themeToggle" title="Changer le thème">
+                <i class="fas fa-palette"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-tab="home">
+                <i class="fas fa-home"></i>
+                Accueil
+            </button>
+            <button class="nav-item" data-tab="calendar">
+                <i class="fas fa-calendar"></i>
+                Calendrier
+            </button>
+            <button class="nav-item" data-tab="statistics">
+                <i class="fas fa-chart-bar"></i>
+                Statistiques
+            </button>
+            <button class="nav-item" data-tab="profile">
+                <i class="fas fa-user"></i>
+                Profil
+            </button>
+            <button class="nav-item" data-tab="settings">
+                <i class="fas fa-cog"></i>
+                Paramètres
+            </button>
+            <button class="nav-item" data-tab="export">
+                <i class="fas fa-download"></i>
+                Export
+            </button>
+            <button class="nav-item" data-tab="support">
+                <i class="fas fa-life-ring"></i>
+                Support
+            </button>
+            <button class="nav-item" data-tab="donate">
+                <i class="fas fa-heart"></i>
+                Me soutenir
+            </button>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Home Tab -->
+            <div id="home" class="tab-content active">
+                <!-- User Welcome with Status -->
+                <div class="card" id="welcomeCard">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profileAvatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="welcomeName">Bonjour !</h3>
+                            <p id="welcomeRole">Alternant</p>
+                            <p id="currentDate"></p>
+                            <!-- Status moved here -->
+                            <div class="status-indicator" style="margin-top: 12px;">
+                                <div class="status-dot off" id="statusDot"></div>
+                                <span id="statusText">Hors service</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Punch Buttons -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-clock"></i>
+                            Pointage
+                        </h3>
+                    </div>
+                   
+                    <div class="punch-grid">
+                        <button class="punch-btn primary" id="startBtn">
+                            <div class="icon"><i class="fas fa-play"></i></div>
+                            <div class="text">ARRIVÉE</div>
+                            <div class="time" id="startTime"></div>
+                        </button>
+                        <button class="punch-btn" id="endBtn">
+                            <div class="icon"><i class="fas fa-stop"></i></div>
+                            <div class="text">DÉPART</div>
+                            <div class="time" id="endTime"></div>
+                        </button>
+                        <button class="punch-btn primary" id="breakStartBtn">
+                            <div class="icon"><i class="fas fa-pause"></i></div>
+                            <div class="text">PAUSE</div>
+                            <div class="time" id="breakStartTime"></div>
+                        </button>
+                        <button class="punch-btn" id="breakEndBtn">
+                            <div class="icon"><i class="fas fa-play"></i></div>
+                            <div class="text">FIN PAUSE</div>
+                            <div class="time" id="breakEndTime"></div>
+                        </button>
+                    </div>
+
+                    <!-- 15 min break option -->
+                    <div class="break-option">
+                        <div class="form-check">
+                            <input type="checkbox" id="skip15min" checked>
+                            <label for="skip15min">Pause de 15 minutes prise aujourd'hui</label>
+                        </div>
+                        <small>Décochez si vous n'avez pas pris votre pause de 15 minutes</small>
+                    </div>
+
+                    <!-- Quick access to modify times -->
+                    <div style="text-align: center; margin-top: 16px;">
+                        <button class="btn btn-secondary" onclick="openEditTimes()">
+                            <i class="fas fa-edit"></i>
+                            Modifier les horaires
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div class="card">
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <span>Progrès du jour</span>
+                            <span id="dayProgress">0h00 / 7h00</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="dayProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Statistiques
+                        </h3>
+                    </div>
+                   
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="todayHours">0h00</div>
+                            <div class="stat-label">Aujourd'hui</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="weekHours">0h00/35h</div>
+                            <div class="stat-label">Cette semaine</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="remainingHours">35h00</div>
+                            <div class="stat-label">Restant</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab with Firebase Integration -->
+            <div id="profile" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user"></i>
+                            Mon Profil
+                        </h3>
+                    </div>
+
+                    <!-- Google Connection Status -->
+                    <div id="connectionStatus" class="connection-status disconnected">
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 4px;">
+                                <i class="fab fa-google"></i>
+                                Sauvegarde cloud
+                            </div>
+                            <div style="font-size: 12px;" id="connectionText">
+                                Connectez-vous pour sauvegarder vos données
+                            </div>
