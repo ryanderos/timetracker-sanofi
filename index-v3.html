@@ -1075,14 +1075,20 @@
            
             if (!date || !type) return;
            
+            // Fix timezone issue by ensuring we use the exact date selected
+            const selectedDate = new Date(date + 'T00:00:00');
+            const dateStr = selectedDate.getFullYear() + '-' + 
+                String(selectedDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(selectedDate.getDate()).padStart(2, '0');
+           
             const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-            specialDays[date] = { type, date: new Date().toISOString() };
+            specialDays[dateStr] = { type, date: new Date().toISOString() };
            
             localStorage.setItem('timeTrackerV2SpecialDays', JSON.stringify(specialDays));
            
             closeModal('specialDayModal');
             window.timeTracker.renderCalendar();
-            window.timeTracker.showNotification('Jour spécial ajouté', `${type} enregistré pour le ${new Date(date).toLocaleDateString('fr-FR')}`);
+            window.timeTracker.showNotification('Jour spécial ajouté', `${type} enregistré pour le ${selectedDate.toLocaleDateString('fr-FR')}`);
         }
 
         function saveSpecialPeriod() {
@@ -1095,17 +1101,22 @@
                 return;
             }
            
-            if (new Date(startDate) > new Date(endDate)) {
+            // Fix timezone issue by using local dates
+            const start = new Date(startDate + 'T00:00:00');
+            const end = new Date(endDate + 'T00:00:00');
+           
+            if (start > end) {
                 window.timeTracker.showNotification('Erreur', 'La date de début doit être antérieure à la date de fin');
                 return;
             }
            
             const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-            const start = new Date(startDate);
-            const end = new Date(endDate);
            
+            // Add each day in the period
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                const dateStr = d.toISOString().split('T')[0];
+                const dateStr = d.getFullYear() + '-' + 
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(d.getDate()).padStart(2, '0');
                 specialDays[dateStr] = { type, date: new Date().toISOString() };
             }
            
@@ -2111,6 +2122,14 @@
                             <label for="skip15min">Pause de 15 minutes prise aujourd'hui</label>
                         </div>
                         <small>Décochez si vous n'avez pas pris votre pause de 15 minutes</small>
+                    </div>
+
+                    <!-- Quick access to modify times -->
+                    <div style="text-align: center; margin-top: 16px;">
+                        <button class="btn btn-secondary" onclick="openEditTimes()">
+                            <i class="fas fa-edit"></i>
+                            Modifier les horaires
+                        </button>
                     </div>
                 </div>
 
