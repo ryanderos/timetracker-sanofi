@@ -455,12 +455,14 @@
                 const endTime = this.endTime || new Date();
                 let totalMinutes = (endTime - this.startTime) / (1000 * 60);
                
+                // Subtract break time (minimum 45 minutes for lunch)
                 if (this.breakStartTime) {
                     const breakEnd = this.breakEndTime || new Date();
                     const breakMinutes = Math.max(45, (breakEnd - this.breakStartTime) / (1000 * 60));
                     totalMinutes -= breakMinutes;
                 }
                
+                // Subtract 15 min daily break if checked
                 const skip15min = document.getElementById('skip15min')?.checked;
                 if (skip15min) {
                     totalMinutes -= 15;
@@ -913,6 +915,7 @@
                         dayElement.appendChild(hours);
                     }
                    
+                    // Special days - with delete option
                     if (specialDays[dateStr]) {
                         dayElement.style.borderColor = 'var(--warning)';
                         dayElement.style.background = 'var(--warning)';
@@ -938,17 +941,33 @@
                 let details = `📅 ${new Date(dateStr).toLocaleDateString('fr-FR')}\n\n`;
                
                 if (specialDay) {
-                    details += `${specialDay.type.toUpperCase()} - 7h comptabilisées automatiquement`;
+                    details += `${specialDay.type.toUpperCase()} - 7h comptabilisées automatiquement\n\n`;
+                    details += `Voulez-vous supprimer ce jour spécial ?`;
+                    
+                    if (confirm(details)) {
+                        this.deleteSpecialDay(dateStr);
+                    }
                 } else if (dayData && dayData.totalHours > 0) {
                     details += `Heures travaillées: ${this.formatHours(dayData.totalHours)}\n`;
                     if (dayData.startTime) details += `Arrivée: ${this.formatTime(new Date(dayData.startTime))}\n`;
                     if (dayData.endTime) details += `Départ: ${this.formatTime(new Date(dayData.endTime))}\n`;
                     if (dayData.breakHours > 0) details += `Pause: ${this.formatHours(dayData.breakHours)}`;
+                    alert(details);
                 } else {
                     details += 'Aucune donnée pour ce jour';
+                    alert(details);
                 }
-               
-                alert(details);
+            }
+
+            deleteSpecialDay(dateStr) {
+                const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
+                const dayType = specialDays[dateStr]?.type || 'jour spécial';
+                
+                delete specialDays[dateStr];
+                localStorage.setItem('timeTrackerV2SpecialDays', JSON.stringify(specialDays));
+                
+                this.renderCalendar();
+                this.showNotification('Jour supprimé', `${dayType} supprimé avec succès`);
             }
 
             updateStatistics() {
@@ -1376,6 +1395,7 @@
             color: var(--text-primary);
             transition: all 0.3s ease;
             overflow-x: hidden;
+            overscroll-behavior: none;
         }
 
         /* Navigation */
