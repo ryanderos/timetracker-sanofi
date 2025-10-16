@@ -1,3 +1,4 @@
+
 <button class="btn btn-secondary btn-lg" onclick="openEditTimes()" style="margin-left: 10px;">
                         <i class="fas fa-edit"></i>
                         Modifier horaires
@@ -374,7 +375,15 @@
                 setInterval(() => this.updateDisplay(), 1000);
                 setInterval(() => this.checkNotifications(), 60000);
             }
-
+          
+            // Helper: Format date en local (évite décalage timezone)
+            formatDateToLocal(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+              
             migrateData() {
                 const oldData = localStorage.getItem('timeTrackerData');
                 if (oldData && !localStorage.getItem('timeTrackerV2Data')) {
@@ -406,7 +415,7 @@
 
             loadData() {
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-                const today = new Date().toISOString().split('T')[0];
+                const today = this.formatDateToLocal(new Date());
                 const todayData = data[today] || {};
                
                 this.startTime = todayData.startTime ? new Date(todayData.startTime) : null;
@@ -422,7 +431,7 @@
 
             saveData() {
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-                const today = new Date().toISOString().split('T')[0];
+                const today = this.formatDateToLocal(new Date());
                
                 data[today] = {
                     startTime: this.startTime?.toISOString(),
@@ -477,6 +486,27 @@
                 const breakEnd = this.breakEndTime || new Date();
                 return Math.max(0.75, (breakEnd - this.breakStartTime) / (1000 * 60 * 60));
             }
+            // Calcul des heures projetées en temps réel (pendant la journée)
+            calculateProjectedHours() {
+                if (!this.startTime || this.endTime) return this.calculateTodayHours();
+                
+                const now = new Date();
+                let totalMinutes = (now - this.startTime) / (1000 * 60);
+                
+                // Déduire la pause déjeuner (min 45 min)
+                if (this.breakStartTime) {
+                    const breakEnd = this.breakEndTime || now;
+                    const breakMinutes = Math.max(45, (breakEnd - this.breakStartTime) / (1000 * 60));
+                    totalMinutes -= breakMinutes;
+                }
+                
+                // Déduire les 15 min si cochées
+                const skip15min = document.getElementById('skip15min')?.checked;
+                if (skip15min) totalMinutes -= 15;
+                
+                return Math.max(0, totalMinutes / 60);
+            }
+
 
             initializeUI() {
                 this.applyTheme();
@@ -680,14 +710,23 @@
             }
 
             updateStats() {
-                const todayHours = this.calculateTodayHours();
-                const weekHours = this.calculateWeekHours();
-                const remainingHours = Math.max(0, this.weeklyGoal - weekHours);
+    const todayHours = this.calculateTodayHours();
+    const weekHours = this.calculateWeekHours();
+    
+    // CORRECTION: Inclure la journée en cours dans le calcul du restant
+    // Si on est en train de travailler, on compte les heures projetées
+    const projectedToday = this.startTime && !this.endTime ? 
+        this.calculateProjectedHours() : todayHours;
+    
+    // Total = heures de la semaine + heures d'aujourd'hui projetées
+    const totalWithToday = weekHours + projectedToday;
+    const remainingHours = Math.max(0, this.weeklyGoal - totalWithToday);
 
-                document.getElementById('todayHours').textContent = this.formatHours(todayHours);
-                document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
-                document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
-            }
+    document.getElementById('todayHours').textContent = this.formatHours(todayHours);
+    document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
+    document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
+}
+
 
             updateProgress() {
                 const todayHours = this.calculateTodayHours();
@@ -706,10 +745,10 @@
                 startOfWeek.setHours(0, 0, 0, 0);
                
                 let totalHours = 0;
-                for (let i = 0; i < 7; i++) {
+                for (let i = 0; i < 5; i++) {  // Lun-Ven uniquement
                     const date = new Date(startOfWeek);
                     date.setDate(startOfWeek.getDate() + i);
-                    const dateStr = date.toISOString().split('T')[0];
+                    const dateStr = this.formatDateToLocal(date);
                    
                     if (data[dateStr]) {
                         totalHours += data[dateStr].totalHours || 0;
@@ -1290,7 +1329,7 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.href = url;
-            link.download = `timetracker_${period}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.download = `timetracker_${period}_${this.formatDateToLocal(new Date())}.csv`;
             link.click();
             URL.revokeObjectURL(url);
            
