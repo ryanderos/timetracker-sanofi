@@ -1141,16 +1141,38 @@
                     }
                    
                     // Special days - with delete option
+                    // Special days - with delete option
                     if (specialDays[dateStr]) {
-                        dayElement.style.borderColor = 'var(--warning)';
-                        dayElement.style.background = 'var(--warning)';
+                        const dayType = specialDays[dateStr].type;
+                        
+                        // Couleurs et icônes selon le type
+                        let backgroundColor = 'var(--warning)';
+                        let icon = '';
+                        
+                        if (dayType === 'ferie') {
+                            backgroundColor = '#9B59B6'; // Violet pour jours fériés
+                            icon = '🎉';
+                        } else if (dayType === 'conge') {
+                            backgroundColor = '#F39C12'; // Orange pour congés
+                            icon = '🏖️';
+                        } else if (dayType === 'maladie') {
+                            backgroundColor = '#E74C3C'; // Rouge pour maladie
+                            icon = '🤒';
+                        } else if (dayType === 'ecole') {
+                            backgroundColor = '#3498DB'; // Bleu pour école
+                            icon = '📚';
+                        }
+                        
+                        dayElement.style.borderColor = backgroundColor;
+                        dayElement.style.background = backgroundColor;
                         dayElement.style.color = 'white';
                        
                         const type = document.createElement('div');
                         type.style.fontSize = '10px';
-                        type.textContent = specialDays[dateStr].type;
+                        type.textContent = icon + ' ' + dayType;
                         dayElement.appendChild(type);
                     }
+
                    
                     dayElement.addEventListener('click', () => this.showDayDetails(dateStr));
                     grid.appendChild(dayElement);
