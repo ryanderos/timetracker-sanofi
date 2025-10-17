@@ -302,6 +302,7 @@
                         <option value="conge">Congé</option>
                         <option value="maladie">Arrêt maladie</option>
                         <option value="ecole">Journée école</option>
+                        <option value="ferie">Jour férié</option>
                     </select>
                 </div>
                 <button class="btn btn-lg" onclick="saveSpecialDay()">
@@ -646,6 +647,7 @@
                 this.updateTimes();
                 this.updateStats();
                 this.updateProgress();
+                this.displayOptimalDeparture();
             }
 
             updateStatus() {
@@ -713,19 +715,22 @@
     const todayHours = this.calculateTodayHours();
     const weekHours = this.calculateWeekHours();
     
-    // CORRECTION: Inclure la journée en cours dans le calcul du restant
-    // Si on est en train de travailler, on compte les heures projetées
-    const projectedToday = this.startTime && !this.endTime ? 
-        this.calculateProjectedHours() : todayHours;
+    // FIX: Le "Restant" doit prendre en compte les heures projetées en temps réel
+    let projectedWeekTotal = weekHours;
     
-    // Total = heures de la semaine + heures d'aujourd'hui projetées
-    const totalWithToday = weekHours + projectedToday;
-    const remainingHours = Math.max(0, this.weeklyGoal - totalWithToday);
+    // Si on est en train de travailler, utiliser les heures projetées d'aujourd'hui
+    if (this.startTime && !this.endTime) {
+        const projectedToday = this.calculateProjectedHours ? this.calculateProjectedHours() : todayHours;
+        projectedWeekTotal = weekHours - todayHours + projectedToday;
+    }
+    
+    const remainingHours = Math.max(0, this.weeklyGoal - projectedWeekTotal);
 
     document.getElementById('todayHours').textContent = this.formatHours(todayHours);
     document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
     document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
 }
+
 
 
             updateProgress() {
@@ -761,6 +766,179 @@
                 }
                
                 return totalHours;
+            }
+
+            // Détecter le dernier jour travaillé de la semaine (ven, ou jeu si ven férié, etc.)
+            getLastWorkDayOfWeek() {
+                const now = new Date();
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Lundi
+                startOfWeek.setHours(0, 0, 0, 0);
+        
+                const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
+                
+                // Parcourir du vendredi au lundi pour trouver le dernier jour travaillé
+                for (let dayOffset = 4; dayOffset >= 0; dayOffset--) { // 4 = vendredi
+                    const checkDate = new Date(startOfWeek);
+                    checkDate.setDate(startOfWeek.getDate() + dayOffset);
+                    const dateStr = this.formatDateToLocal(checkDate);
+                    
+                    // Si ce jour n'est PAS un jour spécial (congé, férié, etc.), c'est le dernier jour travaillé
+                    if (!specialDays[dateStr]) {
+                        return checkDate;
+                    }
+                }
+                
+                // Si tous les jours sont spéciaux, retourner vendredi par défaut
+                const friday = new Date(startOfWeek);
+                friday.setDate(startOfWeek.getDate() + 4);
+                return friday;
+            }
+        
+            // Vérifier si aujourd'hui est le dernier jour travaillé de la semaine
+            isLastWorkDay() {
+                const today = new Date();
+                const lastWorkDay = this.getLastWorkDayOfWeek();
+                return this.formatDateToLocal(today) === this.formatDateToLocal(lastWorkDay);
+            }
+        
+            // Calculer l'heure de départ optimale pour atteindre 35h
+            calculateOptimalDepartureTime() {
+                if (!this.startTime || this.endTime) return null;
+                if (!this.isLastWorkDay()) return null;
+                
+                // Attendre la fin de la pause déjeuner
+                if (this.breakStartTime && !this.breakEndTime) return null;
+                
+                // Calculer heures de la semaine SANS aujourd'hui
+                const weekHours = this.calculateWeekHours();
+                const todayHours = this.calculateTodayHours();
+                const hoursBeforeToday = weekHours - todayHours;
+                
+                // Heures restantes à faire
+                const remainingHours = this.weeklyGoal - hoursBeforeToday;
+                
+                if (remainingHours <= 0) {
+                    return { canLeaveNow: true, remainingHours: 0, hoursBeforeToday };
+                }
+                
+                // Calculer heure de départ
+                const now = new Date();
+                const departureTime = new Date(now);
+                departureTime.setMinutes(departureTime.getMinutes() + (remainingHours * 60));
+                
+                return {
+                    canLeaveNow: false,
+                    departureTime: departureTime,
+                    remainingHours: remainingHours,
+                    hoursBeforeToday: hoursBeforeToday,
+                    todayHours: todayHours
+                };
+            }
+        
+            // Afficher l'encart de départ optimal
+            displayOptimalDeparture() {
+                const card = document.getElementById('optimalDepartureCard');
+                const content = document.getElementById('optimalDepartureContent');
+                
+                if (!card || !content) return;
+                
+                // Masquer si pas le dernier jour travaillé ou si pas encore au travail
+                if (!this.isLastWorkDay() || !this.startTime || this.endTime) {
+                    card.style.display = 'none';
+                    return;
+                }
+                
+                // Masquer pendant la pause déjeuner
+                if (this.breakStartTime && !this.breakEndTime) {
+                    card.style.display = 'none';
+                    return;
+                }
+                
+                const optimal = this.calculateOptimalDepartureTime();
+                if (!optimal) {
+                    card.style.display = 'none';
+                    return;
+                }
+                
+                card.style.display = 'block';
+                
+                // Cas 1 : Objectif déjà atteint
+                if (optimal.canLeaveNow) {
+                    content.innerHTML = `
+                        <div class="optimal-departure-main">
+                            <div style="font-size: 32px;">🎉</div>
+                            <div style="font-size: 24px; margin: 15px 0; font-weight: 600;">
+                                Objectif atteint !
+                            </div>
+                            <div style="font-size: 18px; opacity: 0.9;">
+                                Tu as déjà fait tes ${this.weeklyGoal}h cette semaine
+                            </div>
+                        </div>
+                        <div class="optimal-alert success">
+                            <i class="fas fa-check-circle"></i>
+                            <span><strong>Tu peux pointer maintenant</strong> sans faire d'heures sup !</span>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Cas 2 : Calcul de l'heure optimale
+                const now = new Date();
+                const timeUntilDeparture = (optimal.departureTime - now) / (1000 * 60); // minutes
+                
+                // Alerte si dépassement
+                let alertHtml = '';
+                if (timeUntilDeparture < 0) {
+                    const overtime = Math.abs(timeUntilDeparture);
+                    alertHtml = `
+                        <div class="optimal-alert warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span><strong>ATTENTION :</strong> Tu as dépassé l'heure optimale de ${Math.floor(overtime)}min. Ces heures sup ne seront pas comptabilisées.</span>
+                        </div>
+                    `;
+                } else if (timeUntilDeparture < 15) {
+                    alertHtml = `
+                        <div class="optimal-alert">
+                            <i class="fas fa-clock"></i>
+                            <span><strong>Bientôt !</strong> Tu pourras partir dans ${Math.floor(timeUntilDeparture)} minutes.</span>
+                        </div>
+                    `;
+                }
+                
+                const dayNames = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
+                const lastWorkDayName = dayNames[this.getLastWorkDayOfWeek().getDay()];
+                
+                content.innerHTML = `
+                    <div class="optimal-departure-main">
+                        <div style="font-size: 18px; opacity: 0.9; margin-bottom: 10px;">
+                            Pour atteindre exactement <strong>${this.weeklyGoal}h</strong> cette semaine
+                        </div>
+                        <div class="optimal-departure-time">
+                            🏁 ${this.formatTime(optimal.departureTime)}
+                        </div>
+                        <div class="optimal-countdown">
+                            ⏳ Temps restant à travailler : <strong>${this.formatHours(optimal.remainingHours)}</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="optimal-departure-details">
+                        <div class="optimal-detail-item">
+                            <div class="optimal-detail-label">Déjà fait (lun-${lastWorkDayName === 'ven' ? 'jeu' : lastWorkDayName})</div>
+                            <div class="optimal-detail-value">${this.formatHours(optimal.hoursBeforeToday)}</div>
+                        </div>
+                        <div class="optimal-detail-item">
+                            <div class="optimal-detail-label">Aujourd'hui (en cours)</div>
+                            <div class="optimal-detail-value">${this.formatHours(optimal.todayHours)}</div>
+                        </div>
+                        <div class="optimal-detail-item">
+                            <div class="optimal-detail-label">Restant à faire</div>
+                            <div class="optimal-detail-value">${this.formatHours(optimal.remainingHours)}</div>
+                        </div>
+                    </div>
+                    
+                    ${alertHtml}
+                `;
             }
 
             updateWelcomeMessage() {
@@ -2048,6 +2226,93 @@
                 padding: 16px;
             }
         }
+        /* ============================================ */
+        /* HEURE DE DÉPART OPTIMALE                    */
+        /* ============================================ */
+        #optimalDepartureCard {
+            margin-top: 20px;
+        }
+        
+        .optimal-departure-main {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #B087C4, #8B5A96);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .optimal-departure-time {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 15px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .optimal-departure-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .optimal-detail-item {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .optimal-detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .optimal-detail-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .optimal-countdown {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .optimal-alert {
+            background: #FFF3CD;
+            border: 2px solid #FFE69C;
+            color: #664D03;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .optimal-alert.warning {
+            background: #F8D7DA;
+            border-color: #F5C2C7;
+            color: #842029;
+        }
+        
+        .optimal-alert.success {
+            background: #D1E7DD;
+            border-color: #BADBCC;
+            color: #0F5132;
+        }
+        
+        .optimal-alert i {
+            font-size: 20px;
+        }
+
     </style>
 </head>
 <body>
@@ -2221,6 +2486,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Encart Heure de départ optimale -->
+            <div class="card" id="optimalDepartureCard" style="display: none; margin-top: 20px;">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: white; padding: 15px; border-radius: 8px 8px 0 0;">
+                    <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-clock"></i>
+                        Heure de départ optimale
+                    </h3>
+                </div>
+                
+                <div id="optimalDepartureContent" style="padding: 20px;">
+                    <!-- Généré dynamiquement par JavaScript -->
+                </div>
+            </div>
+
 
             <!-- Profile Tab -->
             <div id="profile" class="tab-content">
